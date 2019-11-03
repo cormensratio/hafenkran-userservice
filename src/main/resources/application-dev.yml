@@ -9,3 +9,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+
+jwt:
+  validity: 18000
+  secret: MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB
