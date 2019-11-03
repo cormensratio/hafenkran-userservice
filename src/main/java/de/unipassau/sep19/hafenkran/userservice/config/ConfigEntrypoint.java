@@ -1,4 +1,4 @@
-package de.unipassau.sep19.hafenkran.clusterservice.config;
+package de.unipassau.sep19.hafenkran.userservice.config;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
