@@ -1,8 +1,8 @@
 package de.unipassau.sep19.hafenkran.userservice.controller;
 
-import de.unipassau.sep19.hafenkran.userservice.config.JwtUserDetailsService;
-import de.unipassau.sep19.hafenkran.userservice.dto.JwtRequestDTO;
-import de.unipassau.sep19.hafenkran.userservice.dto.JwtResponseDTO;
+import de.unipassau.sep19.hafenkran.userservice.dto.AuthRequestDTO;
+import de.unipassau.sep19.hafenkran.userservice.dto.AuthResponseDTO;
+import de.unipassau.sep19.hafenkran.userservice.service.CustomUserDetailsService;
 import de.unipassau.sep19.hafenkran.userservice.util.JwtTokenUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +13,18 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class JwtAuthController {
+public class AuthController {
 
     @NotNull
     @NonNull
@@ -32,16 +36,20 @@ public class JwtAuthController {
 
     @NotNull
     @NonNull
-    private final JwtUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequestDTO authenticationRequest) throws Exception {
+    @NotNull
+    @NonNull
+    private final PasswordEncoder passwordEncoder;
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequestDTO authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponseDTO(token));
+        return ResponseEntity.ok(new AuthResponseDTO(token));
     }
 
     private void authenticate(String username, String password) throws Exception {

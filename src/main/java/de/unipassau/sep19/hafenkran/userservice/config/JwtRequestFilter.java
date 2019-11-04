@@ -1,5 +1,6 @@
 package de.unipassau.sep19.hafenkran.userservice.config;
 
+import de.unipassau.sep19.hafenkran.userservice.service.CustomUserDetailsService;
 import de.unipassau.sep19.hafenkran.userservice.util.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.NonNull;
@@ -27,7 +28,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @NotNull
     @NonNull
-    private final JwtUserDetailsService jwtUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @NotNull
     @NonNull
@@ -53,7 +54,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);
 
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
@@ -64,7 +65,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
         chain.doFilter(request, response);
-
     }
 
 }

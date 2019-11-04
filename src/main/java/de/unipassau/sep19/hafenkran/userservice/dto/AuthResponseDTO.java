@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 @Data
 @RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
-public class JwtResponseDTO implements Serializable {
+public class AuthResponseDTO implements Serializable {
     @NonNull
     @NotEmpty
     @JsonProperty("jwtToken")
