@@ -6,6 +6,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/hafenkran
     username: hafenkran
     password: test
+    initialization-mode: always
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -13,3 +14,5 @@ spring:
 jwt:
   validity: 18000
   secret: MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB
+
+mockdata: true

@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "mockdata",
+      "type": "java.lang.Boolean",
+      "description": "Populates the database with demo data for development purposes."
+    }
+  ]
+}

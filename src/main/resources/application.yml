@@ -20,3 +20,5 @@ spring:
 jwt:
   validity: {5 * 60 * 60}
   secret:
+
+mockdata: false
