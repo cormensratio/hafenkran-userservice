@@ -2,6 +2,7 @@ package de.unipassau.sep19.hafenkran.userservice.controller;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.AuthRequestDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.AuthResponseDTO;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.service.CustomUserDetailsService;
 import de.unipassau.sep19.hafenkran.userservice.util.JwtTokenUtil;
 import lombok.NonNull;
@@ -12,7 +13,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,10 +45,8 @@ public class AuthController {
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequestDTO authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-        final UserDetails userDetails = userDetailsService
-                .loadUserByUsername(authenticationRequest.getUsername());
-
-        final String token = jwtTokenUtil.generateToken(userDetails);
+        UserDTO userDto = userDetailsService.getUserDTOFromUserName(authenticationRequest.getUsername());
+        final String token = jwtTokenUtil.generateToken(userDto);
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }
 

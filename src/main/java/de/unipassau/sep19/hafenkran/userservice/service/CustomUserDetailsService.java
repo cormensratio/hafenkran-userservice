@@ -1,5 +1,6 @@
 package de.unipassau.sep19.hafenkran.userservice.service;
 
+import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.repository.UserRepository;
 import lombok.NonNull;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -27,5 +29,20 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         return org.springframework.security.core.userdetails.User.withUsername(username).password(
                 user.getPassword()).roles().build();
+    }
+
+    public UserDTO getUserDTOFromUserId(UUID userId) {
+        // TODO: custom exception
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new IllegalArgumentException("No user found for id " + userId));
+
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
+    }
+
+    public UserDTO getUserDTOFromUserName(String userName) {
+        User user = userRepository.findByUsername(userName).orElseThrow(
+                () -> new IllegalArgumentException("No user found for name " + userName));
+
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
     }
 }
