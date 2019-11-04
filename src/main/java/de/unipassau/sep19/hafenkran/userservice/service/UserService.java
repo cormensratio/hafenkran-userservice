@@ -34,7 +34,7 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalArgumentException("No user found for id " + userId));
 
-        return new UserDTO(user.getUsername(), user.getId(), user.getEmail(), user.isAdmin());
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
     }
 
     public UserDTO getUserDTOForCurrentUser() {
@@ -44,7 +44,7 @@ public class UserService {
             String username = ((UserDetails) authentication.getPrincipal()).getUsername();
             User user = userRepository.findByUsername(username).orElseThrow(
                     () -> new IllegalArgumentException("No user found for name " + username));
-            return new UserDTO(user.getUsername(), user.getId(), user.getEmail(), user.isAdmin());
+            return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
         } else {
             throw new RuntimeException();
         }

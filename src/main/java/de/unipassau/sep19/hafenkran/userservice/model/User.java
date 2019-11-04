@@ -32,7 +32,6 @@ public class User {
     private String password;
 
     @NonNull
-    @Column(nullable = true)
     private String email;
 
     @Column(nullable = false)
