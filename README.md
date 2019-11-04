@@ -2,7 +2,7 @@
 
 ## UserService
 
-The UserService for the Hafenkran project is used to save user relevant information and as authentication server.
+The UserService for the Hafenkran project is used to save user relevant information, as well as for supplying the JWT used for authenticating users.
 For authentication the server generates a JWT, which can then be forwarded to the other services from the client, so every service knows about the users identity.
 
 ### Setup
