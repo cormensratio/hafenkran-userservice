@@ -1,7 +1,7 @@
 package de.unipassau.sep19.hafenkran.userservice.config;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
-import de.unipassau.sep19.hafenkran.userservice.service.CustomUserDetailsService;
+import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import de.unipassau.sep19.hafenkran.userservice.util.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.NonNull;
@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,13 +22,19 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * A {@link OncePerRequestFilter} for verifying the JWT sent in the header of a client request.
+ */
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     @NonNull
-    private final CustomUserDetailsService customUserDetailsService;
+    private final UserDetailsService customUserDetailsService;
+
+    @NonNull
+    private final UserService userService;
 
     @NonNull
     private final JwtTokenUtil jwtTokenUtil;
@@ -47,12 +54,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
             }
-        } else {
-            log.warn("JWT Token does not begin with Bearer String");
         }
 
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDTO userDto = customUserDetailsService.getUserDTOFromUserId(userId);
+            UserDTO userDto = userService.getUserDTOFromUserId(userId);
 
             if (jwtTokenUtil.validateToken(jwtToken, userDto)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(

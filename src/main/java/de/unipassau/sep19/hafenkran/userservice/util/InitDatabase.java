@@ -26,9 +26,9 @@ public class InitDatabase implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (isLoadMockdata) {
-            UserCreateDTO admin = new UserCreateDTO("Mortimer", "test", "", true);
+            UserCreateDTO admin = new UserCreateDTO("Mortimer", passwordEncoder.encode("test"), "", true);
             userService.registerNewUser(admin);
-            UserCreateDTO user = new UserCreateDTO("Rick", "test", "", false);
+            UserCreateDTO user = new UserCreateDTO("Rick", passwordEncoder.encode("test"), "", false);
             userService.registerNewUser(user);
         }
     }
