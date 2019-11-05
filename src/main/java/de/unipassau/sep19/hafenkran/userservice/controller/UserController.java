@@ -19,8 +19,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public @ResponseBody
-    UserDTO me() {
+    @ResponseBody
+    public UserDTO me() {
         return userService.getUserDTOForCurrentUser();
     }
 }

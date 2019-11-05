@@ -22,7 +22,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
         final User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "name", username));
         return org.springframework.security.core.userdetails.User.withUsername(username).password(
@@ -30,14 +30,14 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     }
 
     @Override
-    public UserDTO getUserDTOFromUserId(UUID userId) {
+    public UserDTO getUserDTOFromUserId(@NonNull UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", userId.toString()));
         return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
     }
 
     @Override
-    public UserDTO getUserDTOFromUserName(String username) {
+    public UserDTO getUserDTOFromUserName(@NonNull String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "name", username));
         return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());

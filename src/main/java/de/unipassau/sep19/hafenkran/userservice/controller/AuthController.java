@@ -44,7 +44,7 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }
 
-    private void authenticate(String username, String password) throws Exception {
+    private void authenticate(@NonNull String username, @NonNull String password) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
