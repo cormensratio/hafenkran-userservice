@@ -1,6 +1,7 @@
 package de.unipassau.sep19.hafenkran.userservice.service.impl;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundException;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.repository.UserRepository;
 import de.unipassau.sep19.hafenkran.userservice.service.CustomUserDetailsService;
@@ -25,26 +26,22 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         final User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new UsernameNotFoundException("User not found with name: " + username));
-
+                () -> new ResourceNotFoundException(User.class, "name", username));
         return org.springframework.security.core.userdetails.User.withUsername(username).password(
                 user.getPassword()).roles().build();
     }
 
     @Override
     public UserDTO getUserDTOFromUserId(UUID userId) {
-        // TODO: custom exception
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("No user found for id " + userId));
-
+                () -> new ResourceNotFoundException(User.class, "id", userId.toString()));
         return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
     }
 
     @Override
-    public UserDTO getUserDTOFromUserName(String userName) {
-        User user = userRepository.findByUsername(userName).orElseThrow(
-                () -> new IllegalArgumentException("No user found for name " + userName));
-
+    public UserDTO getUserDTOFromUserName(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException(User.class, "name", username));
         return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
     }
 }
