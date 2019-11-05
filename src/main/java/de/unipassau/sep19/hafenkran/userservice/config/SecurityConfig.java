@@ -16,22 +16,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.validation.constraints.NotNull;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @NotNull
     @NonNull
     private final JwtAuthEntryPoint jwtAuthenticationEntryPoint;
 
-    @NotNull
     @NonNull
     private final UserDetailsService jwtUserDetailsService;
 
-    @NotNull
     @NonNull
     private final JwtRequestFilter jwtRequestFilter;
 

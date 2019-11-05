@@ -19,26 +19,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.NotNull;
-
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AuthController {
 
-    @NotNull
     @NonNull
     private final AuthenticationManager authenticationManager;
 
-    @NotNull
     @NonNull
     private final JwtTokenUtil jwtTokenUtil;
 
-    @NotNull
     @NonNull
     private final CustomUserDetailsService userDetailsService;
 
-    @NotNull
     @NonNull
     private final PasswordEncoder passwordEncoder;
 

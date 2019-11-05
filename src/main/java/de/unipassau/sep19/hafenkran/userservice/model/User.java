@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
@@ -23,12 +22,12 @@ public class User {
     private UUID id;
 
     @NonNull
-    @NotNull
+    @NotEmpty
     @Column(nullable = false, unique = true)
     private String username;
 
     @NonNull
-    @NotNull
+    @NotEmpty
     private String password;
 
     @NonNull

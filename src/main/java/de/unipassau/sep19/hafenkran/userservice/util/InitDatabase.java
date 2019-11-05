@@ -10,25 +10,21 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
-
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class InitDatabase implements CommandLineRunner {
 
     @NonNull
-    @NotNull
     private final UserService userService;
 
     @NonNull
-    @NotNull
     private final PasswordEncoder passwordEncoder;
 
     @Value("${mockdata:true}")
     private Boolean isLoadMockdata;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (isLoadMockdata) {
             UserCreateDTO admin = new UserCreateDTO("Mortimer", "test", "", true);
             userService.registerNewUser(admin);

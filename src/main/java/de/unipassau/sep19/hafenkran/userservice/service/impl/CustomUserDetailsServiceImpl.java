@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Service
@@ -20,7 +19,6 @@ import java.util.UUID;
 public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
 
     @NonNull
-    @NotNull
     private final UserRepository userRepository;
 
     @Override

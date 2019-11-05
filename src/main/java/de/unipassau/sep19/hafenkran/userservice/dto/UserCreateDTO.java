@@ -7,7 +7,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 @Data
 @RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
@@ -23,7 +22,6 @@ public class UserCreateDTO {
     private final String password;
 
     @NonNull
-    @NotNull
     @JsonProperty("email")
     private final String email;
 

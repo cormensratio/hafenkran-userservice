@@ -18,7 +18,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -27,11 +26,9 @@ import java.util.UUID;
 @Slf4j
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    @NotNull
     @NonNull
     private final CustomUserDetailsService customUserDetailsService;
 
-    @NotNull
     @NonNull
     private final JwtTokenUtil jwtTokenUtil;
 

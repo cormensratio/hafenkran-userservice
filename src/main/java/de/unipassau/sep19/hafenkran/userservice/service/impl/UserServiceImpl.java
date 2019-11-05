@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
 import java.util.UUID;
 
 @Service
@@ -23,15 +23,13 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     @NonNull
-    @NotNull
     private final UserRepository userRepository;
 
     @NonNull
-    @NotNull
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDTO getUserDTOFromUserId(UUID userId) {
+    public UserDTO getUserDTOFromUserId(@NonNull UUID userId) {
         // TODO: custom exception
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalArgumentException("No user found for id " + userId));
@@ -41,7 +39,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserDTOForCurrentUser() {
-        // TODO: custom exception
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof UsernamePasswordAuthenticationToken) {
             String username = ((UserDetails) authentication.getPrincipal()).getUsername();
@@ -54,7 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerNewUser(UserCreateDTO userCreateDTO) {
+    public User registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO) {
         User user = new User(userCreateDTO.getUsername(), passwordEncoder.encode(userCreateDTO.getPassword()),
                 userCreateDTO.getEmail(), userCreateDTO.isAdmin());
         return userRepository.save(user);
