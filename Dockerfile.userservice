@@ -1,0 +1,5 @@
+FROM openjdk:8-jdk-alpine
+VOLUME /tmp
+COPY /target/hafenkran-userservice.jar hafenkran-userservice.jar
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-Dspring.profiles.active=dev","-jar","/hafenkran-userservice.jar"]
+EXPOSE 8080

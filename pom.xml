@@ -7,6 +7,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>userservice</name>
     <description>A web service for managing kubernetes deployments in Hafenkran.</description>
+    <packaging>jar</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -100,6 +101,7 @@
     </dependencies>
 
     <build>
+        <finalName>hafenkran-userservice</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
