@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 public class UserCreateDTO {
+
     @NonNull
     @NotBlank
     @JsonProperty("username")

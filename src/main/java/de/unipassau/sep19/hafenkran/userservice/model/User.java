@@ -11,7 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
 @Data
@@ -24,12 +24,12 @@ public class User {
     private UUID id;
 
     @NonNull
-    @NotEmpty
+    @NotBlank
     @Column(nullable = false, unique = true)
     private String username;
 
     @NonNull
-    @NotEmpty
+    @NotBlank
     private String password;
 
     @NonNull
@@ -38,7 +38,7 @@ public class User {
     @Column(nullable = false)
     private boolean isAdmin;
 
-    public User(@NonNull @NotEmpty String username, @NonNull @NotEmpty String encodedPassword, @NonNull @NotEmpty String email, boolean isAdmin) {
+    public User(@NonNull @NotBlank String username, @NonNull @NotBlank String encodedPassword, @NonNull String email, boolean isAdmin) {
         this.username = username;
         this.password = encodedPassword;
         this.email = email;

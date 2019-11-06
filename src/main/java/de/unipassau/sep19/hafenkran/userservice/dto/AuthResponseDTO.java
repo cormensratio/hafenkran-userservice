@@ -6,14 +6,15 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 @Data
 @RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 public class AuthResponseDTO implements Serializable {
+
     @NonNull
-    @NotEmpty
+    @NotBlank
     @JsonProperty("jwtToken")
     private final String jwtToken;
 }

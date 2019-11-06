@@ -4,9 +4,12 @@ import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,26 +26,25 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.secret}")
     private String secret;
 
-    public String getUserIdFromToken(String token) {
+    public String getUserIdFromToken(@NonNull @NotEmpty String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
-
-    private Date getExpirationDateFromToken(String token) {
+    private Date getExpirationDateFromToken(@NonNull @NotEmpty String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+    private <T> T getClaimFromToken(@NonNull @NotEmpty String token, @NonNull Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(String token) {
+    private Claims getAllClaimsFromToken(@NonNull @NotEmpty String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 
     }
 
-    private Boolean isTokenExpired(String token) {
+    private Boolean isTokenExpired(@NonNull @NotEmpty String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
@@ -53,13 +55,13 @@ public class JwtTokenUtil implements Serializable {
      * @param userDTO the {@link UserDTO} with the information of the current user
      * @return a String with the newly generated JWT
      */
-    public String generateToken(UserDTO userDTO) {
+    public String generateToken(@NonNull @Valid UserDTO userDTO) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("user", userDTO);
         return doGenerateToken(claims, userDTO.getUserId().toString());
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
+    private String doGenerateToken(Map<String, Object> claims, @NonNull @NotEmpty String subject) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
@@ -75,7 +77,7 @@ public class JwtTokenUtil implements Serializable {
      * @param userDto the {@link UserDTO} of the user which it should be validated against.
      * @return {@code true} if token is valid
      */
-    public Boolean validateToken(String token, UserDTO userDto) {
+    public Boolean validateToken(@NonNull @NotEmpty String token, @NonNull @Valid UserDTO userDto) {
         final UUID userIdFromToken = UUID.fromString(getUserIdFromToken(token));
         return (userIdFromToken.equals(userDto.getUserId()) && !isTokenExpired(token));
     }

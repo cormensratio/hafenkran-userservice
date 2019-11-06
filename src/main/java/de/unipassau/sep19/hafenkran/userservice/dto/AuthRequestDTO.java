@@ -6,19 +6,20 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 @Data
 @RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 public class AuthRequestDTO implements Serializable {
+
     @NonNull
-    @NotEmpty
+    @NotBlank
     @JsonProperty("username")
     private final String username;
 
     @NonNull
-    @NotEmpty
+    @NotBlank
     @JsonProperty("password")
     private final String password;
 }
