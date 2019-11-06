@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.xml.bind.ValidationException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -118,7 +119,6 @@ public class UserServiceImplTest {
         verifyNoMoreInteractions(userRepository);
     }
 
-    /*
     @Test
     public void testRegisterNewUser_emptyName_exception() {
         // Arrange
@@ -142,7 +142,6 @@ public class UserServiceImplTest {
 
         // Assert - with rule
     }
-*/
 
 
     @Test
