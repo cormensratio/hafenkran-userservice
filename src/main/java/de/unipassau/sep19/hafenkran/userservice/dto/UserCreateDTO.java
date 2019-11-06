@@ -6,18 +6,18 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 public class UserCreateDTO {
     @NonNull
-    @NotEmpty
+    @NotBlank
     @JsonProperty("username")
     private final String username;
 
     @NonNull
-    @NotEmpty
+    @NotBlank
     @JsonProperty("password")
     private final String password;
 

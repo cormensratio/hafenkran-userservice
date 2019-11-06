@@ -2,6 +2,7 @@ package de.unipassau.sep19.hafenkran.userservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
@@ -30,4 +31,8 @@ public class UserDTO {
 
     @Getter(onMethod = @__(@JsonProperty("isAdmin")))
     private final boolean isAdmin;
+
+    public static UserDTO fromUser(User user) {
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
+    }
 }

@@ -15,8 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.util.UUID;
 
 /**
@@ -47,14 +47,14 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUserDTOFromUserId(@NonNull UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", userId.toString()));
-        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
+        return UserDTO.fromUser(user);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public User registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO) {
+    public User registerNewUser(@NonNull @Validated UserCreateDTO userCreateDTO) {
         User user = User.fromUserCreateDTO(userCreateDTO);
         return userRepository.save(user);
     }
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUserDTOFromUserName(@NonNull String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "name", username));
-        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
+        return UserDTO.fromUser(user);
     }
 
     /**
