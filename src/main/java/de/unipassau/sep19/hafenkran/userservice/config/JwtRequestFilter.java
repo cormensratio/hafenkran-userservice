@@ -45,6 +45,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         UUID userId = null;
         String jwtToken = null;
 
+        // Retrieve the userId from the JWT if it exists
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
@@ -56,6 +57,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
 
+        // Set the UserDto as authentication object for the current session if the user is authenticated with a token
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDTO userDto = userService.getUserDTOFromUserId(userId);
 

@@ -35,7 +35,6 @@ public class JwtTokenUtil implements Serializable {
     private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
-
     }
 
     private Claims getAllClaimsFromToken(String token) {
@@ -48,6 +47,12 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(new Date());
     }
 
+    /**
+     * Generate a new token for the current user including the users information in the token.
+     *
+     * @param userDTO the {@link UserDTO} with the information of the current user
+     * @return a String with the newly generated JWT
+     */
     public String generateToken(UserDTO userDTO) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("user", userDTO);
@@ -63,6 +68,13 @@ public class JwtTokenUtil implements Serializable {
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
+    /**
+     * Validates the JWT whether it is expired
+     *
+     * @param token   the JWT
+     * @param userDto the {@link UserDTO} of the user which it should be validated against.
+     * @return {@code true} if token is valid
+     */
     public Boolean validateToken(String token, UserDTO userDto) {
         final UUID userIdFromToken = UUID.fromString(getUserIdFromToken(token));
         return (userIdFromToken.equals(userDto.getUserId()) && !isTokenExpired(token));
