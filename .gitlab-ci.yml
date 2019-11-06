@@ -8,4 +8,9 @@ before_script:
 
 build:
   stage: build
-  script: ./mvnw verify
+  script:
+    - ./mvnw verify
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
