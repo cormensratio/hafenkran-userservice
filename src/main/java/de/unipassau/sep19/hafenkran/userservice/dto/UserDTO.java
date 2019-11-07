@@ -16,8 +16,8 @@ import java.util.UUID;
 public class UserDTO {
 
     @NonNull
-    @JsonProperty("userId")
-    private final UUID userId;
+    @JsonProperty("id")
+    private final UUID id;
 
     @NonNull
     @NotBlank

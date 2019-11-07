@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUserDTOForCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof UsernamePasswordAuthenticationToken) {
-            UUID userId = ((UserDTO) authentication.getPrincipal()).getUserId();
+            UUID userId = ((UserDTO) authentication.getPrincipal()).getId();
             return this.getUserDTOFromUserId(userId);
         } else {
             throw new RuntimeException("The user is not authenticated correctly!");
