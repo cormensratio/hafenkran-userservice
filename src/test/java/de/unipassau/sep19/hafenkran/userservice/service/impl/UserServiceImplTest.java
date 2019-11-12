@@ -118,6 +118,7 @@ public class UserServiceImplTest {
         verifyNoMoreInteractions(userRepository);
     }
 
+    // TODO: https://cnaccjira.fim.uni-passau.de/browse/EPDS02-73
     /*
     @Test
     public void testRegisterNewUser_emptyName_exception() {

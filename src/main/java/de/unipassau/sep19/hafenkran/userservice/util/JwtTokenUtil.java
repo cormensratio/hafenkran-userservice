@@ -13,39 +13,54 @@ import org.springframework.stereotype.Component;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 @Component
 public class JwtTokenUtil implements Serializable {
 
-    @Value("${jwt.validity}")
-    private Long JWT_TOKEN_VALIDITY;
+    private final Long jwtTokenValidity;
 
-    @Value("${jwt.secret}")
-    private String secret;
+    private final String jwtSecret;
 
-    public String getUserIdFromToken(@NonNull @NotEmpty String token) {
-        return getClaimFromToken(token, Claims::getSubject);
+    public JwtTokenUtil(@Value("${jwt.validity}") Long jwtTokenValidity, @Value("${jwt.secret}") String jwtSecret) {
+        this.jwtTokenValidity = jwtTokenValidity;
+        this.jwtSecret = jwtSecret;
     }
 
+    /**
+     * Reads the {@link UUID} expected in the subject of the given JWT.
+     *
+     * @param token the JWT from where to read the id of the user.
+     * @return the {@link UUID} in the subject.
+     */
+    public UUID getUserIdFromToken(@NonNull @NotEmpty String token) {
+        return UUID.fromString(getClaimFromToken(token, Claims::getSubject));
+    }
+
+    /**
+     * Retrieves the {@link UserDTO} from the given JWT.
+     * Throws a {@link InvalidJwtException} if the token does not contain the UserDTO.
+     *
+     * @param token the JWT from where to read the {@link UserDTO}
+     * @return the submitted {@link UserDTO}
+     */
     public UserDTO getUserDTOFromToken(@NonNull @NotEmpty String token) {
         final Claims claims = getAllClaimsFromToken(token);
         final UserDTO userDTO;
         try {
-            userDTO = claims.get("user", UserDTO.class);
-        } catch (RequiredTypeException e) {
+            LinkedHashMap userInformation = claims.get("user", LinkedHashMap.class);
+            userDTO = new UserDTO(
+                    UUID.fromString(userInformation.get("id").toString()),
+                    userInformation.get("username").toString(),
+                    userInformation.get("email").toString(),
+                    userInformation.get("isAdmin").toString().equals("true")
+            );
+        } catch (RequiredTypeException | IllegalArgumentException e) {
             throw new InvalidJwtException(UserDTO.class, "user", e);
         }
 
-        if (userDTO == null) {
-            throw new InvalidJwtException(UserDTO.class, "user");
-        }
-
-        return claims.get("user", UserDTO.class);
+        return userDTO;
     }
 
     private Date getExpirationDateFromToken(@NonNull @NotEmpty String token) {
@@ -58,7 +73,7 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private Claims getAllClaimsFromToken(@NonNull @NotEmpty String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(@NonNull @NotEmpty String token) {
@@ -83,8 +98,8 @@ public class JwtTokenUtil implements Serializable {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
+                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenValidity * 1000))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
     }
 
     /**
@@ -95,7 +110,7 @@ public class JwtTokenUtil implements Serializable {
      * @return {@code true} if token is valid
      */
     public Boolean validateToken(@NonNull @NotEmpty String token, @NonNull @Valid UserDTO userDto) {
-        final UUID userIdFromToken = UUID.fromString(getUserIdFromToken(token));
+        final UUID userIdFromToken = getUserIdFromToken(token);
         return (userIdFromToken.equals(userDto.getId()) && !isTokenExpired(token));
     }
 
