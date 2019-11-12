@@ -1,8 +1,10 @@
 package de.unipassau.sep19.hafenkran.userservice.util;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.exception.InvalidJwtException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.RequiredTypeException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +32,22 @@ public class JwtTokenUtil implements Serializable {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
+    public UserDTO getUserDTOFromToken(@NonNull @NotEmpty String token) {
+        final Claims claims = getAllClaimsFromToken(token);
+        final UserDTO userDTO;
+        try {
+            userDTO = claims.get("user", UserDTO.class);
+        } catch (RequiredTypeException e) {
+            throw new InvalidJwtException(UserDTO.class, "user", e);
+        }
+
+        if (userDTO == null) {
+            throw new InvalidJwtException(UserDTO.class, "user");
+        }
+
+        return claims.get("user", UserDTO.class);
+    }
+
     private Date getExpirationDateFromToken(@NonNull @NotEmpty String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
@@ -41,7 +59,6 @@ public class JwtTokenUtil implements Serializable {
 
     private Claims getAllClaimsFromToken(@NonNull @NotEmpty String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-
     }
 
     private Boolean isTokenExpired(@NonNull @NotEmpty String token) {
