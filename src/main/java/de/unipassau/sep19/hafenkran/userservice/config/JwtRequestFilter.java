@@ -1,7 +1,6 @@
 package de.unipassau.sep19.hafenkran.userservice.config;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
-import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import de.unipassau.sep19.hafenkran.userservice.util.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.NonNull;
@@ -30,9 +29,6 @@ import java.util.UUID;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     @NonNull
-    private final UserService userService;
-
-    @NonNull
     private final JwtTokenUtil jwtTokenUtil;
 
     @Override
@@ -55,7 +51,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         // Set the UserDto as authentication object for the current session if the user is authenticated with a token
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDTO userDto = userService.getUserDTOFromUserId(userId);
+            UserDTO userDto = jwtTokenUtil.getUserDTOFromToken(jwtToken);
 
             if (jwtTokenUtil.validateToken(jwtToken, userDto)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
