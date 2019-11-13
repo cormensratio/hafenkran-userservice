@@ -1,5 +1,6 @@
 package de.unipassau.sep19.hafenkran.userservice.service.impl;
 
+import de.unipassau.sep19.hafenkran.userservice.config.JwtAuthentication;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundException;
@@ -9,7 +10,6 @@ import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -75,8 +75,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO getUserDTOForCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof UsernamePasswordAuthenticationToken) {
-            UUID userId = ((UserDTO) authentication.getPrincipal()).getId();
+        if (authentication instanceof JwtAuthentication) {
+            UUID userId = ((UserDTO) authentication.getDetails()).getId();
             return this.getUserDTOFromUserId(userId);
         } else {
             throw new RuntimeException("The user is not authenticated correctly!");
