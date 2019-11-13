@@ -11,7 +11,7 @@ import javax.validation.Valid;
  */
 public class JwtAuthentication extends AbstractAuthenticationToken {
 
-    JwtAuthentication(@NonNull @Valid UserDTO userDTO) {
+    public JwtAuthentication(@NonNull @Valid UserDTO userDTO) {
         super(null);
         super.setAuthenticated(true);
         super.setDetails(userDTO);

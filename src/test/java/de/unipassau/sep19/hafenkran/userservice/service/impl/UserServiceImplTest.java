@@ -1,5 +1,6 @@
 package de.unipassau.sep19.hafenkran.userservice.service.impl;
 
+import de.unipassau.sep19.hafenkran.userservice.config.JwtAuthentication;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundException;
@@ -13,7 +14,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -179,11 +179,10 @@ public class UserServiceImplTest {
         // Arrange
         UserDTO userDTO = UserDTO.fromUser(testUser);
         SecurityContext mockContext = mock(SecurityContext.class);
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                userDTO, null, null);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
 
         SecurityContextHolder.setContext(mockContext);
-        when(mockContext.getAuthentication()).thenReturn(usernamePasswordAuthenticationToken);
+        when(mockContext.getAuthentication()).thenReturn(auth);
         when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
 
         // Act
