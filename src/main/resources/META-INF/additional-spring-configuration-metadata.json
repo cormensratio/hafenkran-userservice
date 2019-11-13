@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "mockdata",
+      "type": "java.lang.Boolean",
+      "description": "Populates the database with demo data for development purposes."
+    },
+    {
+      "name": "jwt.validity",
+      "type": "java.lang.Long",
+      "description": "The time in seconds for which a generated JWT is valid."
+    },
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "The secret used for signing JWTs."
+    }
+  ]
+}
