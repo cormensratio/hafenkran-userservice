@@ -26,7 +26,7 @@ public class JwtTokenUtilTest {
     private JwtTokenUtil subject;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.subject = new JwtTokenUtil(18000L, "MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB");
         this.jwt = subject.generateToken(USER_DTO);
     }
@@ -80,7 +80,7 @@ public class JwtTokenUtilTest {
         // Arrange
 
         // Act
-        boolean actual = subject.validateToken(jwt, USER_DTO);
+        boolean actual = subject.validateToken(jwt);
 
         // Assert
         assertTrue(actual);
@@ -95,7 +95,7 @@ public class JwtTokenUtilTest {
         jwt = subject.generateToken(USER_DTO);
 
         // Act
-        boolean actual = subject.validateToken(jwt, USER_DTO);
+        boolean actual = subject.validateToken(jwt);
 
         // Assert - with rule
     }
