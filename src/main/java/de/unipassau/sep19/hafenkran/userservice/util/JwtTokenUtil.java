@@ -34,7 +34,7 @@ public class JwtTokenUtil implements Serializable {
      * @param token the JWT from where to read the id of the user.
      * @return the {@link UUID} in the subject.
      */
-    public UUID getUserIdFromToken(@NonNull @NotEmpty String token) {
+    public UUID getUserIdFromToken(@NonNull String token) {
         return UUID.fromString(getClaimFromToken(token, Claims::getSubject));
     }
 
@@ -45,7 +45,7 @@ public class JwtTokenUtil implements Serializable {
      * @param token the JWT from where to read the {@link UserDTO}
      * @return the submitted {@link UserDTO}
      */
-    public UserDTO getUserDTOFromToken(@NonNull @NotEmpty String token) {
+    public UserDTO getUserDTOFromToken(@NonNull String token) {
         final Claims claims = getAllClaimsFromToken(token);
         final UserDTO userDTO;
         try {
@@ -63,20 +63,20 @@ public class JwtTokenUtil implements Serializable {
         return userDTO;
     }
 
-    private Date getExpirationDateFromToken(@NonNull @NotEmpty String token) {
+    private Date getExpirationDateFromToken(@NonNull String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    private <T> T getClaimFromToken(@NonNull @NotEmpty String token, @NonNull Function<Claims, T> claimsResolver) {
+    private <T> T getClaimFromToken(@NonNull String token, @NonNull Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(@NonNull @NotEmpty String token) {
+    private Claims getAllClaimsFromToken(@NonNull String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
     }
 
-    private Boolean isTokenExpired(@NonNull @NotEmpty String token) {
+    private Boolean isTokenExpired(@NonNull String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }

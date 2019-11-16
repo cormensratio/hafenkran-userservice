@@ -1,6 +1,7 @@
 package de.unipassau.sep19.hafenkran.userservice.repository;
 
 import de.unipassau.sep19.hafenkran.userservice.model.User;
+import lombok.NonNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 public interface UserRepository extends CrudRepository<User, UUID> {
 
     @Override
-    Optional<User> findById(UUID uuid);
+    Optional<User> findById(@NonNull UUID uuid);
 
     Optional<User> findByUsername(String username);
 }

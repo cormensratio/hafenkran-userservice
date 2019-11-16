@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.Valid;
 
 /**
  * A {@link RestController} for requesting a JWT for a user session.
@@ -44,14 +44,14 @@ public class AuthController {
      * @return a {@link AuthResponseDTO} including the newly generated token
      */
     @PostMapping("/authenticate")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequestDTO authenticationRequest) {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody @Valid AuthRequestDTO authenticationRequest) {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         UserDTO userDto = userService.getUserDTOFromUserName(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDto);
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }
 
-    private void authenticate(@NonNull @NotBlank String username, @NotBlank @NonNull String password) {
+    private void authenticate(@NonNull String username, @NonNull String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {

@@ -15,8 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 /**
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public User registerNewUser(@NonNull @Validated UserCreateDTO userCreateDTO) {
+    public User registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO) {
         User user = User.fromUserCreateDTO(userCreateDTO);
         return userRepository.save(user);
     }

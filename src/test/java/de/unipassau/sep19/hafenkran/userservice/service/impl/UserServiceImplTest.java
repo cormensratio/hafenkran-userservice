@@ -118,33 +118,6 @@ public class UserServiceImplTest {
         verifyNoMoreInteractions(userRepository);
     }
 
-    // TODO: https://cnaccjira.fim.uni-passau.de/browse/EPDS02-73
-    /*
-    @Test
-    public void testRegisterNewUser_emptyName_exception() {
-        // Arrange
-        UserCreateDTO testDto = new UserCreateDTO("", "test", "test", false);
-        expectedEx.expect(ValidationException.class);
-
-        // Act
-        subject.registerNewUser(testDto);
-
-        // Assert - with rule
-    }
-
-    @Test
-    public void testRegisterNewUser_emptyPassword_exception() {
-        // Arrange
-        UserCreateDTO testDto = new UserCreateDTO("test", "", "test", false);
-        expectedEx.expect(ValidationException.class);
-
-        // Act
-        subject.registerNewUser(testDto);
-
-        // Assert - with rule
-    }
-*/
-
     @Test
     public void testGetUserDTOFromUsername_validUsername_validUserDTOReturned() {
         // Arrange
