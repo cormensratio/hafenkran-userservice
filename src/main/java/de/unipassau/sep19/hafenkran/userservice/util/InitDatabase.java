@@ -29,10 +29,10 @@ public class InitDatabase implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (isLoadMockdata) {
-            User user = new User("Mortimer", passwordEncoder.encode("test"), "", true);
-            user.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
-            userService.registerNewUser(user);
-            User user2 = new User("Rick", passwordEncoder.encode("test"), "", false);
+            User admin = new User("Mortimer", passwordEncoder.encode("test"), "", true);
+            admin.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+            userService.registerNewUser(admin);
+            User user = new User("Rick", passwordEncoder.encode("test"), "", false);
             user.setId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
             userService.registerNewUser(user);
         }
