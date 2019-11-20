@@ -44,14 +44,11 @@ public class User {
         this.password = encodedPassword;
         this.email = email;
         this.isAdmin = isAdmin;
+        this.id = UUID.randomUUID();
     }
 
     public static User fromUserCreateDTO(@NonNull UserCreateDTO userDTO) {
         return new User(userDTO.getUsername(), userDTO.getPassword(), userDTO.getEmail(), userDTO.isAdmin());
     }
 
-    @PrePersist
-    private void prePersist() {
-        this.id = UUID.randomUUID();
-    }
 }

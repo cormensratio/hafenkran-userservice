@@ -56,6 +56,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO) {
         User user = User.fromUserCreateDTO(userCreateDTO);
+        return registerNewUser(user);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public User registerNewUser(@NonNull User user) {
         return userRepository.save(user);
     }
 

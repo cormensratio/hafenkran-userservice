@@ -29,6 +29,14 @@ public interface UserService extends UserDetailsService {
     User registerNewUser(@NonNull UserCreateDTO userCreateDTO);
 
     /**
+     * Creates and saves a new user.
+     *
+     * @param user the user saved in the database.
+     * @return the new {@link User} returned after saving to the database.
+     */
+    User registerNewUser(@NonNull User user);
+
+    /**
      * Retrieve the {@link UserDTO} for the user with the given username.
      *
      * @param username used for the lookup of the user
