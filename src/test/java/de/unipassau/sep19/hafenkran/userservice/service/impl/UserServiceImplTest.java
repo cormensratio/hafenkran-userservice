@@ -45,16 +45,16 @@ public class UserServiceImplTest {
     public void testLoadUserByUsername_validName_validUserDetailsReturned() {
         // Arrange
         UserDetails expectedUserDetails = org.springframework.security.core.userdetails.User.withUsername(
-                testUser.getUsername()).password(
+                testUser.getName()).password(
                 testUser.getPassword()).roles().build();
 
-        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.of(testUser));
+        when(userRepository.findByUsername(testUser.getName())).thenReturn(Optional.of(testUser));
 
         // Act
-        UserDetails actual = subject.loadUserByUsername(testUser.getUsername());
+        UserDetails actual = subject.loadUserByUsername(testUser.getName());
 
         // Assert
-        verify(userRepository, times(1)).findByUsername(testUser.getUsername());
+        verify(userRepository, times(1)).findByUsername(testUser.getName());
         assertEquals(expectedUserDetails, actual);
         verifyNoMoreInteractions(userRepository);
     }
@@ -104,7 +104,7 @@ public class UserServiceImplTest {
     @Test
     public void testRegisterNewUser_validUserCreateDTO_validUserReturned() {
         // Arrange
-        UserCreateDTO createDTO = new UserCreateDTO(testUser.getUsername(), testUser.getPassword(), testUser.getEmail(),
+        UserCreateDTO createDTO = new UserCreateDTO(testUser.getName(), testUser.getPassword(), testUser.getEmail(),
                 testUser.isAdmin());
         when(userRepository.save(any(User.class))).thenReturn(testUser);
 
@@ -121,13 +121,13 @@ public class UserServiceImplTest {
     public void testGetUserDTOFromUsername_validUsername_validUserDTOReturned() {
         // Arrange
         UserDTO expectedDTO = UserDTO.fromUser(testUser);
-        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.of(testUser));
+        when(userRepository.findByUsername(testUser.getName())).thenReturn(Optional.of(testUser));
 
         // Act
-        UserDTO actual = subject.getUserDTOFromUserName(testUser.getUsername());
+        UserDTO actual = subject.getUserDTOFromUserName(testUser.getName());
 
         // Assert
-        verify(userRepository, times(1)).findByUsername(testUser.getUsername());
+        verify(userRepository, times(1)).findByUsername(testUser.getName());
         assertEquals(expectedDTO, actual);
         verifyNoMoreInteractions(userRepository);
     }
