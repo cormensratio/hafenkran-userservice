@@ -39,10 +39,10 @@ public interface UserService extends UserDetailsService {
     /**
      * Retrieve the {@link UserDTO} for the user with the given username.
      *
-     * @param username used for the lookup of the user
+     * @param name the username used for the lookup of the user
      * @return the {@link UserDTO} representation of the corresponding user
      */
-    UserDTO getUserDTOFromUserName(@NonNull String username);
+    UserDTO getUserDTOFromUserName(@NonNull String name);
 
     /**
      * Fetches the currently active user represented as DTO.
