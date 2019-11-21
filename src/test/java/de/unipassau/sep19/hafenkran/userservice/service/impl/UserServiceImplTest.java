@@ -48,13 +48,13 @@ public class UserServiceImplTest {
                 testUser.getName()).password(
                 testUser.getPassword()).roles().build();
 
-        when(userRepository.findByUsername(testUser.getName())).thenReturn(Optional.of(testUser));
+        when(userRepository.findByName(testUser.getName())).thenReturn(Optional.of(testUser));
 
         // Act
         UserDetails actual = subject.loadUserByUsername(testUser.getName());
 
         // Assert
-        verify(userRepository, times(1)).findByUsername(testUser.getName());
+        verify(userRepository, times(1)).findByName(testUser.getName());
         assertEquals(expectedUserDetails, actual);
         verifyNoMoreInteractions(userRepository);
     }
@@ -64,7 +64,7 @@ public class UserServiceImplTest {
         // Arrange
         String testUserName = "nonExistingUsername";
         expectedEx.expect(ResourceNotFoundException.class);
-        when(userRepository.findByUsername(testUserName)).thenReturn(Optional.empty());
+        when(userRepository.findByName(testUserName)).thenReturn(Optional.empty());
 
         // Act
         subject.loadUserByUsername(testUserName);
@@ -121,13 +121,13 @@ public class UserServiceImplTest {
     public void testGetUserDTOFromUsername_validUsername_validUserDTOReturned() {
         // Arrange
         UserDTO expectedDTO = UserDTO.fromUser(testUser);
-        when(userRepository.findByUsername(testUser.getName())).thenReturn(Optional.of(testUser));
+        when(userRepository.findByName(testUser.getName())).thenReturn(Optional.of(testUser));
 
         // Act
         UserDTO actual = subject.getUserDTOFromUserName(testUser.getName());
 
         // Assert
-        verify(userRepository, times(1)).findByUsername(testUser.getName());
+        verify(userRepository, times(1)).findByName(testUser.getName());
         assertEquals(expectedDTO, actual);
         verifyNoMoreInteractions(userRepository);
     }
@@ -138,7 +138,7 @@ public class UserServiceImplTest {
         // Arrange
         String testUserName = "nonExistingUsername";
         expectedEx.expect(ResourceNotFoundException.class);
-        when(userRepository.findByUsername(testUserName)).thenReturn(Optional.empty());
+        when(userRepository.findByName(testUserName)).thenReturn(Optional.empty());
 
         // Act
         subject.getUserDTOFromUserName(testUserName);

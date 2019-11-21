@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDetails loadUserByUsername(@NonNull String name) throws UsernameNotFoundException {
-        final User user = userRepository.findByUsername(name).orElseThrow(
+        final User user = userRepository.findByName(name).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "name", name));
         return org.springframework.security.core.userdetails.User.withUsername(name).password(
                 user.getPassword()).roles().build();
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDTO getUserDTOFromUserName(@NonNull String name) {
-        User user = userRepository.findByUsername(name).orElseThrow(
+        User user = userRepository.findByName(name).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "name", name));
         return UserDTO.fromUser(user);
     }
