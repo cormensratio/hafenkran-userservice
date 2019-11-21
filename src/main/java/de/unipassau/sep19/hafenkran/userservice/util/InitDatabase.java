@@ -1,6 +1,7 @@
 package de.unipassau.sep19.hafenkran.userservice.util;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
+import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -26,9 +29,11 @@ public class InitDatabase implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (isLoadMockdata) {
-            UserCreateDTO admin = new UserCreateDTO("Mortimer", passwordEncoder.encode("test"), "", true);
+            User admin = new User("Mortimer", passwordEncoder.encode("test"), "", true);
+            admin.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
             userService.registerNewUser(admin);
-            UserCreateDTO user = new UserCreateDTO("Rick", passwordEncoder.encode("test"), "", false);
+            User user = new User("Rick", passwordEncoder.encode("test"), "", false);
+            user.setId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
             userService.registerNewUser(user);
         }
     }

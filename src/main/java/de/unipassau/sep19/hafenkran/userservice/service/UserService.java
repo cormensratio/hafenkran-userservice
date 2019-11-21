@@ -6,7 +6,6 @@ import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import javax.validation.Valid;
 import java.util.UUID;
 
 /**
@@ -27,7 +26,15 @@ public interface UserService extends UserDetailsService {
      * @param userCreateDTO the DTO used for creating the user.
      * @return the new {@link User} returned after saving to the database.
      */
-    User registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO);
+    User registerNewUser(@NonNull UserCreateDTO userCreateDTO);
+
+    /**
+     * Creates and saves a new user.
+     *
+     * @param user the user saved in the database.
+     * @return the new {@link User} returned after saving to the database.
+     */
+    User registerNewUser(@NonNull User user);
 
     /**
      * Retrieve the {@link UserDTO} for the user with the given username.

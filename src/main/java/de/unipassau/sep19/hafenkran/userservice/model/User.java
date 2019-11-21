@@ -10,7 +10,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
@@ -25,32 +24,31 @@ public class User {
 
     @NonNull
     @NotBlank
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String username;
 
     @NonNull
     @NotBlank
+    @Column(nullable = false)
     private String password;
 
     @NonNull
+    @Column
     private String email;
 
     @Column(nullable = false)
     private boolean isAdmin;
 
-    public User(@NonNull @NotBlank String username, @NonNull @NotBlank String encodedPassword, @NonNull String email, boolean isAdmin) {
+    public User(@NonNull String username, @NonNull String encodedPassword, @NonNull String email, boolean isAdmin) {
         this.username = username;
         this.password = encodedPassword;
         this.email = email;
         this.isAdmin = isAdmin;
+        this.id = UUID.randomUUID();
     }
 
-    public static User fromUserCreateDTO(@NonNull @Valid UserCreateDTO userDTO) {
+    public static User fromUserCreateDTO(@NonNull UserCreateDTO userDTO) {
         return new User(userDTO.getUsername(), userDTO.getPassword(), userDTO.getEmail(), userDTO.isAdmin());
     }
 
-    @PrePersist
-    private void prePersist() {
-        this.id = UUID.randomUUID();
-    }
 }
