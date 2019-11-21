@@ -14,5 +14,5 @@ public interface UserRepository extends CrudRepository<User, UUID> {
     @Override
     Optional<User> findById(@NonNull UUID uuid);
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findByName(String name);
 }

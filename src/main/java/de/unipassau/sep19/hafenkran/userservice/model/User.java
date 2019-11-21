@@ -25,7 +25,7 @@ public class User {
     @NonNull
     @NotBlank
     @Column(nullable = false)
-    private String username;
+    private String name;
 
     @NonNull
     @NotBlank
@@ -39,8 +39,8 @@ public class User {
     @Column(nullable = false)
     private boolean isAdmin;
 
-    public User(@NonNull String username, @NonNull String encodedPassword, @NonNull String email, boolean isAdmin) {
-        this.username = username;
+    public User(@NonNull String name, @NonNull String encodedPassword, @NonNull String email, boolean isAdmin) {
+        this.name = name;
         this.password = encodedPassword;
         this.email = email;
         this.isAdmin = isAdmin;
@@ -48,7 +48,7 @@ public class User {
     }
 
     public static User fromUserCreateDTO(@NonNull UserCreateDTO userDTO) {
-        return new User(userDTO.getUsername(), userDTO.getPassword(), userDTO.getEmail(), userDTO.isAdmin());
+        return new User(userDTO.getName(), userDTO.getPassword(), userDTO.getEmail(), userDTO.isAdmin());
     }
 
 }

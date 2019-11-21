@@ -14,8 +14,8 @@ public class UserCreateDTO {
 
     @NonNull
     @NotBlank
-    @JsonProperty("username")
-    private final String username;
+    @JsonProperty("name")
+    private final String name;
 
     @NonNull
     @NotBlank
