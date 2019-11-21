@@ -32,6 +32,6 @@ public class UserDTO {
     private final boolean isAdmin;
 
     public static UserDTO fromUser(@NonNull User user) {
-        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.isAdmin());
+        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.isAdmin());
     }
 }
