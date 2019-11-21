@@ -106,14 +106,13 @@ public class UserServiceImplTest {
         // Arrange
         UserCreateDTO createDTO = new UserCreateDTO(testUser.getUsername(), testUser.getPassword(), testUser.getEmail(),
                 testUser.isAdmin());
-        testUser.setId(null);
-        when(userRepository.save(testUser)).thenReturn(testUser);
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
 
         // Act
         User actual = subject.registerNewUser(createDTO);
 
         // Assert
-        verify(userRepository, times(1)).save(testUser);
+        verify(userRepository, times(1)).save(any(User.class));
         assertEquals(testUser, actual);
         verifyNoMoreInteractions(userRepository);
     }
