@@ -5,10 +5,7 @@ import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * A {@link RestController} for retrieving basic user information.
@@ -30,5 +27,12 @@ public class UserController {
     @ResponseBody
     public UserDTO me() {
         return userService.getUserDTOForCurrentUser();
+    }
+
+    @PostMapping("/update")
+    @ResponseBody
+    public UserDTO updateUser(@RequestParam("user") UserDTO newUserInfo,
+                              @RequestParam(value = "newPassword", required = false) String newPassword) {
+        return userService.updateUser(newUserInfo, newPassword);
     }
 }

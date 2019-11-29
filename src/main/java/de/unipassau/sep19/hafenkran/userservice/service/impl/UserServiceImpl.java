@@ -91,4 +91,28 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserDTO updateUser(@NonNull UserDTO updateUserDTO, String newPassword) {
+        UUID id = updateUserDTO.getId();
+        User userToUpdate = userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(User.class, "id", id.toString()));
+        String password = userToUpdate.getPassword();
+        if (newPassword != null && !newPassword.equals("")) {
+            password = newPassword;
+        }
+        User updatedUser = new User(
+                id,
+                updateUserDTO.getName(),
+                password,
+                updateUserDTO.getEmail(),
+                updateUserDTO.isAdmin()
+        );
+        userRepository.deleteById(id);
+        userRepository.save(updatedUser);
+        return getUserDTOFromUserId(id);
+    }
+
 }
