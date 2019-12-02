@@ -22,7 +22,7 @@ public class UserController {
 
     @NonNull
     private final UserService userService;
-    
+
     /**
      * Retrieves the {@link UserDTO} for the currently active user session.
      *
@@ -38,7 +38,7 @@ public class UserController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public User createNewUser(@NonNull @RequestBody
-                                  @Valid UserCreateDTO userCreateDTO){
+                              @Valid UserCreateDTO userCreateDTO) {
         return userService.registerNewUser(userCreateDTO);
     }
 }
