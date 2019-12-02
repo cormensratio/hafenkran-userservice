@@ -1,14 +1,16 @@
 package de.unipassau.sep19.hafenkran.userservice.controller;
 
+import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * A {@link RestController} for retrieving basic user information.
@@ -30,5 +32,13 @@ public class UserController {
     @ResponseBody
     public UserDTO me() {
         return userService.getUserDTOForCurrentUser();
+    }
+
+    @PostMapping("/create")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public User createNewUser(@NonNull @RequestBody
+                                  @Valid UserCreateDTO userCreateDTO){
+        return userService.registerNewUser(userCreateDTO);
     }
 }
