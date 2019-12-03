@@ -1,11 +1,14 @@
 package de.unipassau.sep19.hafenkran.userservice.controller;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * A {@link RestController} for retrieving basic user information.
@@ -31,8 +34,7 @@ public class UserController {
 
     @PostMapping("/update")
     @ResponseBody
-    public UserDTO updateUser(@RequestParam("user") UserDTO newUserInfo,
-                              @RequestParam(value = "newPassword", required = false) String newPassword) {
-        return userService.updateUser(newUserInfo, newPassword);
+    public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo) {
+        return userService.updateUser(newUserInfo);
     }
 }

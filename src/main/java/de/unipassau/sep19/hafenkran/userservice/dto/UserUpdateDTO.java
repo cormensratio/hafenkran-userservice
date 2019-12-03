@@ -14,22 +14,19 @@ import java.util.UUID;
 public class UserUpdateDTO {
 
     @NonNull
-    @NotBlank
     @JsonProperty("id")
     private final UUID id;
 
     @NonNull
     @NotBlank
-    @JsonProperty("newPassword")
-    private final String newPassword;
+    @JsonProperty("password")
+    private final String password;
 
     @NonNull
     @NotBlank
     @JsonProperty("email")
-    private final String eMail;
+    private final String email;
 
-    @NonNull
-    @NotBlank
     @JsonProperty("isAdmin")
     private final boolean isAdmin;
 }

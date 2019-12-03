@@ -2,6 +2,7 @@ package de.unipassau.sep19.hafenkran.userservice.service;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -57,6 +58,6 @@ public interface UserService extends UserDetailsService {
      * @param updateUserDTO the DTO that contains the new user info
      * @return the {@link UserDTO} of the updated user
      */
-    UserDTO updateUser(@NonNull UserDTO updateUserDTO, String newPassword);
+    UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO);
 
 }

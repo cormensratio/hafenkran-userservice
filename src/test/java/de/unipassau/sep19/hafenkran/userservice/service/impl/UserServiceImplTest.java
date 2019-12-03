@@ -166,4 +166,31 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findById(testUser.getId());
         verifyNoMoreInteractions(mockContext, userRepository);
     }
+
+    @Test
+    public void testUpdateUser_existingUser_newPassword() {
+        // Arrange
+
+        // Act
+
+        // Assert
+    }
+
+    @Test
+    public void testUpdateUser_existingUser_noNewPassword() {
+        // Arrange
+
+        // Act
+
+        // Assert
+    }
+
+    @Test
+    public void testUpdateUser_nonExistingUser_exception() {
+        // Arrange
+
+        // Act
+
+        // Assert
+    }
 }

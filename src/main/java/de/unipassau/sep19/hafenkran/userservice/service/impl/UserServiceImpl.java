@@ -3,10 +3,12 @@ package de.unipassau.sep19.hafenkran.userservice.service.impl;
 import de.unipassau.sep19.hafenkran.userservice.config.JwtAuthentication;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundException;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.repository.UserRepository;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
+import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,22 +97,23 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserDTO updateUser(@NonNull UserDTO updateUserDTO, String newPassword) {
+    public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO) {
         UUID id = updateUserDTO.getId();
         User userToUpdate = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", id.toString()));
-        String password = userToUpdate.getPassword();
-        if (newPassword != null && !newPassword.equals("")) {
-            password = newPassword;
+
+        boolean isAdmin = userToUpdate.isAdmin();
+        if (SecurityContextUtil.getCurrentUserDTO().isAdmin()) {
+            isAdmin = updateUserDTO.isAdmin();
         }
+
         User updatedUser = new User(
                 id,
-                updateUserDTO.getName(),
-                password,
+                userToUpdate.getName(),
+                updateUserDTO.getPassword(),
                 updateUserDTO.getEmail(),
-                updateUserDTO.isAdmin()
+                isAdmin
         );
-        userRepository.deleteById(id);
         userRepository.save(updatedUser);
         return getUserDTOFromUserId(id);
     }
