@@ -51,7 +51,7 @@ public class UserController {
         if (currentUser.isAdmin()) {
             return userService.registerNewUser(userCreateDTO);
         } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to create new Users");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to create new users");
         }
     }
 }
