@@ -102,6 +102,7 @@ public class UserServiceImpl implements UserService {
         User userToUpdate = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", id.toString()));
 
+        // set admin flag of updated user only, if the user that updates it is an admin
         boolean isAdmin = userToUpdate.isAdmin();
         if (SecurityContextUtil.getCurrentUserDTO().isAdmin()) {
             isAdmin = updateUserDTO.isAdmin();
