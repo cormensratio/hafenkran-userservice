@@ -34,6 +34,12 @@ public class UserController {
         return userService.getUserDTOForCurrentUser();
     }
 
+    /**
+     * Endpoint for creating a new {@link User}.
+     *
+     * @param userCreateDTO The DTO used to create the new {@link User}.
+     * @return The newly created {@link User}.
+     */
     @PostMapping("/create")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
