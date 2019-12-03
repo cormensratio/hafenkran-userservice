@@ -4,11 +4,13 @@ import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
+import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 
@@ -45,6 +47,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public User createNewUser(@NonNull @RequestBody
                               @Valid UserCreateDTO userCreateDTO) {
-        return userService.registerNewUser(userCreateDTO);
+        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
+        if (currentUser.isAdmin()) {
+            return userService.registerNewUser(userCreateDTO);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to create new Users");
+        }
     }
 }
