@@ -24,7 +24,7 @@ public class User {
 
     @NonNull
     @NotBlank
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @NonNull
