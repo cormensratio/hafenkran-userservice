@@ -3,10 +3,12 @@ package de.unipassau.sep19.hafenkran.userservice.service.impl;
 import de.unipassau.sep19.hafenkran.userservice.config.JwtAuthentication;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundException;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.repository.UserRepository;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
+import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,11 +19,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -33,12 +36,15 @@ public class UserServiceImplTest {
     private UserRepository userRepository;
     private UserService subject;
     private User testUser;
+    private User testUser2;
 
     @Before
     public void setUp() {
         this.subject = new UserServiceImpl(userRepository);
         this.testUser = new User("testUser", "testPassword", "testMail", false);
+        this.testUser2 = new User("testUser", "testPassword", "testMail", false);
         this.testUser.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+        this.testUser2.setId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
     }
 
     @Test
@@ -168,29 +174,82 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void testUpdateUser_existingUser_newPassword() {
+    public void testUpdateUser_existingUser_userSuccessfullyUpdated() {
         // Arrange
+        UserUpdateDTO newUserInfo = new UserUpdateDTO(
+                testUser.getId(),
+                "newpassword",
+                "newmail",
+                true
+        );
+
+        UserDTO userDTO = UserDTO.fromUser(testUser);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+
+        SecurityContextHolder.setContext(mockContext);
+        when(mockContext.getAuthentication()).thenReturn(auth);
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
 
         // Act
+        UserDTO updatedUser = subject.updateUser(newUserInfo);
 
         // Assert
+        assertEquals(updatedUser.getId(), testUser.getId());
+        assertEquals(updatedUser.getEmail(), newUserInfo.getEmail());
+        assertFalse(updatedUser.isAdmin());
+        verify(mockContext, times(2)).getAuthentication();
+        verify(userRepository, times(1)).findById(testUser.getId());
+        verifyNoMoreInteractions(mockContext, userRepository);
     }
 
-    @Test
-    public void testUpdateUser_existingUser_noNewPassword() {
-        // Arrange
-
-        // Act
-
-        // Assert
-    }
 
     @Test
     public void testUpdateUser_nonExistingUser_exception() {
         // Arrange
+        expectedEx.expect(ResourceNotFoundException.class);
+        UserUpdateDTO newUserInfo = new UserUpdateDTO(
+                UUID.fromString("00000000-0000-0000-0000-000000000009"),
+                "newpassword",
+                "newmail",
+                true
+        );
+
+        UserDTO userDTO = UserDTO.fromUser(testUser);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+
+        SecurityContextHolder.setContext(mockContext);
+        when(mockContext.getAuthentication()).thenReturn(auth);
 
         // Act
+        subject.updateUser(newUserInfo);
 
-        // Assert
+        // Assert - with rule
+    }
+
+    @Test
+    public void testUpdateUser_updateOtherUserAsNonAdmin() {
+        // Arrange
+        UserUpdateDTO newUserInfo = new UserUpdateDTO(
+                testUser2.getId(),
+                "newpassword",
+                "newmail",
+                true
+        );
+        expectedEx.expect(ResponseStatusException.class);
+
+        UserDTO userDTO = UserDTO.fromUser(testUser);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // Act
+        subject.updateUser(newUserInfo);
+
+        // Assert - with rule
     }
 }

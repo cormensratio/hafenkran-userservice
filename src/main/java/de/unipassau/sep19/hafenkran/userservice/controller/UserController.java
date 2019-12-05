@@ -32,6 +32,12 @@ public class UserController {
         return userService.getUserDTOForCurrentUser();
     }
 
+    /**
+     * Updates the given user
+     *
+     * @param newUserInfo the DTO that holds the new user info
+     * @return a {@link UserDTO} containing the details of the updated user
+     */
     @PostMapping("/update")
     @ResponseBody
     public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo) {

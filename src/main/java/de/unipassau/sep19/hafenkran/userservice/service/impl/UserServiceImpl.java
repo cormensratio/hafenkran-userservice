@@ -12,12 +12,15 @@ import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.UUID;
 
@@ -97,26 +100,37 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO) {
         UUID id = updateUserDTO.getId();
         User userToUpdate = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", id.toString()));
 
-        // set admin flag of updated user only, if the user that updates it is an admin
+        boolean currentUserIsAdmin = SecurityContextUtil.getCurrentUserDTO().isAdmin();
+
+        if (!id.equals(SecurityContextUtil.getCurrentUserDTO().getId()) && !currentUserIsAdmin) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "Only admins are allowed update other users!");
+        }
+
+        // set admin flag of updated user only if the user that updates it is an admin
         boolean isAdmin = userToUpdate.isAdmin();
-        if (SecurityContextUtil.getCurrentUserDTO().isAdmin()) {
+        if (currentUserIsAdmin) {
             isAdmin = updateUserDTO.isAdmin();
+        }
+
+        String password = userToUpdate.getPassword();
+        if (!updateUserDTO.getPassword().equals("")) {
+            password = updateUserDTO.getPassword();
         }
 
         User updatedUser = new User(
                 id,
                 userToUpdate.getName(),
-                updateUserDTO.getPassword(),
+                password,
                 updateUserDTO.getEmail(),
                 isAdmin
         );
-        userRepository.save(updatedUser);
-        return getUserDTOFromUserId(id);
+        return UserDTO.fromUser(updatedUser);
     }
-
 }
