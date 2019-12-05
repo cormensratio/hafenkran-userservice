@@ -220,7 +220,6 @@ public class UserServiceImplTest {
         JwtAuthentication auth = new JwtAuthentication(userDTO);
 
         SecurityContextHolder.setContext(mockContext);
-        when(mockContext.getAuthentication()).thenReturn(auth);
 
         // Act
         subject.updateUser(newUserInfo);
@@ -243,9 +242,6 @@ public class UserServiceImplTest {
         SecurityContext mockContext = mock(SecurityContext.class);
         JwtAuthentication auth = new JwtAuthentication(userDTO);
         SecurityContextHolder.setContext(mockContext);
-
-        when(mockContext.getAuthentication()).thenReturn(auth);
-        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
 
         // Act
         subject.updateUser(newUserInfo);
