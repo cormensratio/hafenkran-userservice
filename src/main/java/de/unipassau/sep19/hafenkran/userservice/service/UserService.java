@@ -2,16 +2,27 @@ package de.unipassau.sep19.hafenkran.userservice.service;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOList;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
  * A {@link org.springframework.stereotype.Service} for interacting with user entities.
  */
 public interface UserService extends UserDetailsService {
+
+    /**
+     * Retrieves the {@link UserDTO}s of all users or from the users with the specific {@code ids}.
+     *
+     * @param ids The ids to get the UserDTO from.
+     * @return An {@link UserDTOList} with all {@link UserDTO}s within.
+     */
+    List<UserDTO> retrieveUserDTOList(List<UUID> ids);
+
     /**
      * Retrieve the {@link UserDTO} for the user with the given userId.
      *
