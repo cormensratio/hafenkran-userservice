@@ -63,7 +63,7 @@ public class UserController {
      *
      * @return An {@link UserDTOList} with all users or all requested users.
      */
-    @GetMapping("/all")
+    @GetMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public List<UserDTO> retrieveAllUsers(@RequestParam("ids") List<UUID> ids) {
