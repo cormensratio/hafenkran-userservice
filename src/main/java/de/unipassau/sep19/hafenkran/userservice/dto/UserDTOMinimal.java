@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Data
 @RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
-public class UserDTO {
+public class UserDTOMinimal {
 
     @NonNull
     @JsonProperty("id")
@@ -26,19 +25,13 @@ public class UserDTO {
     @JsonProperty("name")
     private final String name;
 
-    @NonNull
-    @JsonProperty("email")
-    private final String email;
-
-    @Getter(onMethod = @__(@JsonProperty("isAdmin")))
-    private final boolean isAdmin;
-
-    public static UserDTO fromUser(@NonNull User user) {
-        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.isAdmin());
+    public static UserDTOMinimal fromMinimalUser(@NonNull User user) {
+        return new UserDTOMinimal(user.getId(), user.getName());
     }
 
-    public static List<UserDTO> convertUserListToDTOList(@NonNull List<User> userList) {
+    public static List<UserDTOMinimal> convertMinimalUserListToDTOList(@NonNull List<User> userList) {
         return userList.stream()
-                .map(UserDTO::fromUser).collect(Collectors.toList());
+                .map(UserDTOMinimal::fromMinimalUser).collect(Collectors.toList());
     }
+
 }

@@ -2,7 +2,7 @@ package de.unipassau.sep19.hafenkran.userservice.service;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
-import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOList;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,12 +16,22 @@ import java.util.UUID;
 public interface UserService extends UserDetailsService {
 
     /**
-     * Retrieves the {@link UserDTO}s of all users or from the users with the specific {@code ids}.
+     * Retrieves the {@link UserDTO}s with the name, id, email and adminflag of all users or from the users with
+     * the specific {@code ids}.
      *
      * @param ids The ids to get the UserDTO from.
-     * @return An {@link UserDTOList} with all {@link UserDTO}s within.
+     * @return An List of {@link UserDTO}s with all {@link UserDTO}s within.
      */
-    List<UserDTO> retrieveUserDTOList(List<UUID> ids);
+    List<UserDTO> retrieveUserInformationForAdmin(List<UUID> ids);
+
+    /**
+     * Retrieves the {@link UserDTOMinimal}s containing the name and the id of all users or from the users with
+     * the specific {@code ids}.
+     *
+     * @param ids The ids to get the UserDTOMinimal from.
+     * @return An List of {@link UserDTOMinimal}s with all {@link UserDTOMinimal}s within.
+     */
+    List<UserDTOMinimal> retrieveUserInformation(List<UUID> ids);
 
     /**
      * Retrieve the {@link UserDTO} for the user with the given userId.

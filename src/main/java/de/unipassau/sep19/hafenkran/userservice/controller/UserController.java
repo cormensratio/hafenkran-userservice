@@ -2,7 +2,7 @@ package de.unipassau.sep19.hafenkran.userservice.controller;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
-import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOList;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
@@ -59,15 +59,21 @@ public class UserController {
     }
 
     /**
-     * GET-Endpoint for receiving all {@link UserDTO}s of all users in the network or of all users with the {@code ids}.
+     * GET-Endpoint for receiving all {@link UserDTO}s of all users in the network or of all users with the {@code ids}
+     * if you are an admin, or receiving all {@link UserDTOMinimal}s if you are not an admin.
      *
-     * @return An {@link UserDTOList} with all users or all requested users.
+     * @return A list of {@link UserDTO}s or {@link UserDTOMinimal}s with all users or all requested users.
      */
     @GetMapping("/all")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDTO> retrieveAllUsers(@RequestParam("ids") List<UUID> ids) {
-        return userService.retrieveUserDTOList(ids);
+    public List<?> retrieveAllUsers(@RequestParam("ids") List<UUID> ids) {
+        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
+        if (currentUser.isAdmin()) {
+            return userService.retrieveUserInformationForAdmin(ids);
+        } else {
+            return userService.retrieveUserInformation(ids);
+        }
     }
 
 }
