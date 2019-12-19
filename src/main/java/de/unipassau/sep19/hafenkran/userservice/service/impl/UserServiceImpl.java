@@ -3,6 +3,7 @@ package de.unipassau.sep19.hafenkran.userservice.service.impl;
 import de.unipassau.sep19.hafenkran.userservice.config.JwtAuthentication;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
 import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundException;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.repository.UserRepository;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -38,6 +40,30 @@ public class UserServiceImpl implements UserService {
                 () -> new ResourceNotFoundException(User.class, "name", name));
         return org.springframework.security.core.userdetails.User.withUsername(name).password(
                 user.getPassword()).roles().build();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserDTO> retrieveUserInformationForAdmin(List<UUID> ids) {
+        return UserDTO.convertUserListToDTOList(findUserList(ids));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserDTOMinimal> retrieveUserInformation(List<UUID> ids) {
+        return UserDTOMinimal.convertMinimalUserListToDTOList(findUserList(ids));
+    }
+
+    private List<User> findUserList(List<UUID> ids) {
+        if (ids.isEmpty()) {
+            return (List<User>) userRepository.findAll();
+        } else {
+            return userRepository.findByIdIn(ids);
+        }
     }
 
     /**
