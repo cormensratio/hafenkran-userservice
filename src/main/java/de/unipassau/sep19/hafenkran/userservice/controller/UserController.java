@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,8 +68,11 @@ public class UserController {
     @GetMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public List<?> retrieveAllUsers(@RequestParam("ids") List<UUID> ids) {
+    public List<?> retrieveAllUsers(@RequestParam(name = "ids", required = false) List<UUID> ids) {
         UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
+        if (ids == null) {
+            ids = Collections.emptyList();
+        }
         if (currentUser.isAdmin()) {
             return userService.retrieveUserInformationForAdmin(ids);
         } else {
