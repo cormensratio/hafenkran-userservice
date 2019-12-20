@@ -46,10 +46,10 @@ public class UserController {
      * @param userCreateDTO The DTO used to create the new {@link User}.
      * @return The newly created {@link User}.
      */
-    @PostMapping("/create")
+    @PostMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public User createNewUser(@NonNull @RequestBody
+    public UserDTO createNewUser(@NonNull @RequestBody
                               @Valid UserCreateDTO userCreateDTO) {
         UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
         if (currentUser.isAdmin()) {
