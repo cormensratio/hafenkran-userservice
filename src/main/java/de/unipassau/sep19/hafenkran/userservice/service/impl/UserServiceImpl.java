@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO) {
         UUID id = updateUserDTO.getId();
-        User userToUpdate = userRepository.findById(id).orElseThrow(
+        User targetUser = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", id.toString()));
 
         boolean currentUserIsAdmin = SecurityContextUtil.getCurrentUserDTO().isAdmin();
@@ -118,31 +118,37 @@ public class UserServiceImpl implements UserService {
         }
 
         if (!currentUserIsAdmin) {
-            if (!isPasswordMatching(userToUpdate.getPassword(), updateUserDTO.getPassword())) {
+            if (!isPasswordMatching(targetUser.getPassword(), updateUserDTO.getPassword())) {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                         "The given user password is not correct!");
             }
         }
 
         // set admin flag of updated user only if the user that updates it is an admin
-        boolean isAdmin = userToUpdate.isAdmin();
+        boolean isAdmin = targetUser.isAdmin();
         if (currentUserIsAdmin) {
             isAdmin = updateUserDTO.isAdmin();
         }
 
-        String password = userToUpdate.getPassword();
+        String password = targetUser.getPassword();
         if (!updateUserDTO.getPassword().equals("")) {
             password = updateUserDTO.getPassword();
         }
 
-        userToUpdate.setPassword(password);
-        userToUpdate.setEmail(updateUserDTO.getEmail());
-        userToUpdate.setAdmin(isAdmin);
+        targetUser.setPassword(password);
+        targetUser.setEmail(updateUserDTO.getEmail());
+        targetUser.setAdmin(isAdmin);
 
-        return UserDTO.fromUser(userToUpdate);
+        return UserDTO.fromUser(targetUser);
     }
 
-    private boolean isPasswordMatching(@NonNull String encodedPassword, @NonNull String passwordToCheck) {
-        return passwordEncoder.matches(passwordToCheck, encodedPassword);
+    /**
+     * Checks if two passwords, one encoded, the other in plain text are matching
+     * @param encodedPassword the encoded password
+     * @param plaintextPassword the plain text password
+     * @return if passwords are matching
+     */
+    private boolean isPasswordMatching(@NonNull String encodedPassword, @NonNull String plaintextPassword) {
+        return passwordEncoder.matches(plaintextPassword, encodedPassword);
     }
 }
