@@ -164,11 +164,11 @@ public class UserServiceImpl implements UserService {
         }
 
         String password = targetUser.getPassword();
-        if (!updateUserDTO.getPassword().equals("")) {
-            password = updateUserDTO.getPassword();
+        if (!updateUserDTO.getNewPassword().equals("")) {
+            password = updateUserDTO.getNewPassword();
         }
 
-        targetUser.setPassword(password);
+        targetUser.setPassword(passwordEncoder.encode(password));
         targetUser.setEmail(updateUserDTO.getEmail());
         targetUser.setAdmin(isAdmin);
 
