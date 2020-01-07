@@ -124,13 +124,10 @@ public class UserServiceImpl implements UserService {
             password = updateUserDTO.getPassword();
         }
 
-        User updatedUser = new User(
-                id,
-                userToUpdate.getName(),
-                password,
-                updateUserDTO.getEmail(),
-                isAdmin
-        );
-        return UserDTO.fromUser(updatedUser);
+        userToUpdate.setPassword(password);
+        userToUpdate.setEmail(updateUserDTO.getEmail());
+        userToUpdate.setAdmin(isAdmin);
+
+        return UserDTO.fromUser(userToUpdate);
     }
 }
