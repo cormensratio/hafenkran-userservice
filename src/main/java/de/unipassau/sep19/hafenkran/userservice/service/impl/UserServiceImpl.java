@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,6 +31,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @NonNull
     private final UserRepository userRepository;
@@ -113,6 +117,13 @@ public class UserServiceImpl implements UserService {
                     "Only admins are allowed update other users!");
         }
 
+        if (!currentUserIsAdmin) {
+            if (!isPasswordMatching(userToUpdate.getPassword(), updateUserDTO.getPassword())) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "The given user password is not correct!");
+            }
+        }
+
         // set admin flag of updated user only if the user that updates it is an admin
         boolean isAdmin = userToUpdate.isAdmin();
         if (currentUserIsAdmin) {
@@ -129,5 +140,12 @@ public class UserServiceImpl implements UserService {
         userToUpdate.setAdmin(isAdmin);
 
         return UserDTO.fromUser(userToUpdate);
+    }
+
+    private boolean isPasswordMatching(String encodedPassword, String passwordToCheck) {
+        if (encodedPassword != null && passwordToCheck != null) {
+            return passwordEncoder.matches(passwordToCheck, encodedPassword);
+        }
+        return false;
     }
 }

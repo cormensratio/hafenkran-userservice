@@ -18,9 +18,13 @@ public class UserUpdateDTO {
     private final UUID id;
 
     @NonNull
-    @NotBlank
     @JsonProperty("password")
     private final String password;
+
+    @NonNull
+    @NotBlank
+    @JsonProperty("newPassword")
+    private final String newPassword;
 
     @NonNull
     @NotBlank
