@@ -47,8 +47,8 @@ public class User {
         this.id = UUID.randomUUID();
     }
 
-    public static User fromUserCreateDTO(@NonNull UserCreateDTO userDTO) {
-        return new User(userDTO.getName(), userDTO.getPassword(), userDTO.getEmail(), userDTO.isAdmin());
+    public static User fromUserCreateDTO(@NonNull UserCreateDTO userDTO, @NonNull String encodedPassword) {
+        return new User(userDTO.getName(), encodedPassword, userDTO.getEmail(), userDTO.isAdmin());
     }
 
 }
