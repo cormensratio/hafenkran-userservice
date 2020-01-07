@@ -43,7 +43,7 @@ public class UserServiceImplTest {
 
     @Before
     public void setUp() {
-        this.subject = new UserServiceImpl(passwordEncoder, userRepository);
+        this.subject = new UserServiceImpl(userRepository, passwordEncoder);
         this.testUser = new User("testUser", "testPassword", "testMail", false);
         this.testUser2 = new User("testUser", "testPassword", "testMail", false);
         this.testUser.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
@@ -108,22 +108,6 @@ public class UserServiceImplTest {
         subject.getUserDTOFromUserId(testId);
 
         // Assert - with rule
-    }
-
-    @Test
-    public void testRegisterNewUser_validUserCreateDTO_validUserReturned() {
-        // Arrange
-        UserCreateDTO createDTO = new UserCreateDTO(testUser.getName(), testUser.getPassword(), testUser.getEmail(),
-                testUser.isAdmin());
-        when(userRepository.save(any(User.class))).thenReturn(testUser);
-
-        // Act
-        User actual = subject.registerNewUser(createDTO);
-
-        // Assert
-        verify(userRepository, times(1)).save(any(User.class));
-        assertEquals(testUser, actual);
-        verifyNoMoreInteractions(userRepository);
     }
 
     @Test

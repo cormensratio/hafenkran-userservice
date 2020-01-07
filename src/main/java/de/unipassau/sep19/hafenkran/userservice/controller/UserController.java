@@ -2,6 +2,7 @@ package de.unipassau.sep19.hafenkran.userservice.controller;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
@@ -17,6 +18,9 @@ import javax.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * A {@link RestController} for retrieving basic user information.
@@ -30,7 +34,7 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * Retrieves the {@link UserDTO} for the currently active user session.
+     * GET-Endpoint for retrieving the {@link UserDTO} for the currently active user session.
      *
      * @return a {@link UserDTO} containing the details of a user
      */
@@ -41,15 +45,15 @@ public class UserController {
     }
 
     /**
-     * Endpoint for creating a new {@link User}.
+     * POST-Endpoint for creating a new {@link User}.
      *
      * @param userCreateDTO The DTO used to create the new {@link User}.
      * @return The newly created {@link User}.
      */
-    @PostMapping("/create")
+    @PostMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public User createNewUser(@NonNull @RequestBody
+    public UserDTO createNewUser(@NonNull @RequestBody
                               @Valid UserCreateDTO userCreateDTO) {
         UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
         if (currentUser.isAdmin()) {
@@ -58,6 +62,28 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to create new users");
         }
     }
+
+    /**
+     * GET-Endpoint for receiving all {@link UserDTO}s of all users in the network or of all users with the {@code ids}
+     * if you are an admin, or receiving all {@link UserDTOMinimal}s if you are not an admin.
+     *
+     * @return A list of {@link UserDTO}s or {@link UserDTOMinimal}s with all users or all requested users.
+     */
+    @GetMapping
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public List<?> retrieveAllUsers(@RequestParam(name = "ids", required = false) List<UUID> ids) {
+        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
+        if (ids == null) {
+            ids = Collections.emptyList();
+        }
+        if (currentUser.isAdmin()) {
+            return userService.retrieveUserInformationForAdmin(ids);
+        } else {
+            return userService.retrieveUserInformation(ids);
+        }
+    }
+
 
     /**
      * Updates the given user

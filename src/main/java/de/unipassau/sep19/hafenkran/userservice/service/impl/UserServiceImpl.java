@@ -3,6 +3,7 @@ package de.unipassau.sep19.hafenkran.userservice.service.impl;
 import de.unipassau.sep19.hafenkran.userservice.config.JwtAuthentication;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundException;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
@@ -12,6 +13,8 @@ import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,20 +26,22 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * {@inheritDoc}
  */
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor(onConstructor = @__({@Autowired, @Lazy}))
 public class UserServiceImpl implements UserService {
 
     @NonNull
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @NonNull
-    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * {@inheritDoc}
@@ -53,6 +58,30 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    public List<UserDTO> retrieveUserInformationForAdmin(List<UUID> ids) {
+        return UserDTO.convertUserListToDTOList(findUserList(ids));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserDTOMinimal> retrieveUserInformation(List<UUID> ids) {
+        return UserDTOMinimal.convertMinimalUserListToDTOList(findUserList(ids));
+    }
+
+    private List<User> findUserList(List<UUID> ids) {
+        if (ids.isEmpty()) {
+            return (List<User>) userRepository.findAll();
+        } else {
+            return userRepository.findByIdIn(ids);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UserDTO getUserDTOFromUserId(@NonNull UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", userId.toString()));
@@ -63,9 +92,10 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public User registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO) {
-        User user = User.fromUserCreateDTO(userCreateDTO);
-        return registerNewUser(user);
+    public UserDTO registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO) {
+        User user = registerNewUser(
+                User.fromUserCreateDTO(userCreateDTO, passwordEncoder.encode(userCreateDTO.getPassword())));
+        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.isAdmin());
     }
 
     /**
@@ -73,6 +103,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User registerNewUser(@NonNull User user) {
+        if(userRepository.findByName(user.getName()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A user with the name " + user.getName() + " already exists");
+        }
         return userRepository.save(user);
     }
 
