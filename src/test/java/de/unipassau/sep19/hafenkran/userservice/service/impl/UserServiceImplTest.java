@@ -19,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -34,13 +35,15 @@ public class UserServiceImplTest {
     public ExpectedException expectedEx = ExpectedException.none();
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     private UserService subject;
     private User testUser;
     private User testUser2;
 
     @Before
     public void setUp() {
-        this.subject = new UserServiceImpl(userRepository);
+        this.subject = new UserServiceImpl(passwordEncoder, userRepository);
         this.testUser = new User("testUser", "testPassword", "testMail", false);
         this.testUser2 = new User("testUser", "testPassword", "testMail", false);
         this.testUser.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
@@ -178,6 +181,7 @@ public class UserServiceImplTest {
         // Arrange
         UserUpdateDTO newUserInfo = new UserUpdateDTO(
                 testUser.getId(),
+                testUser.getPassword(),
                 "newpassword",
                 "newmail",
                 true
@@ -190,6 +194,7 @@ public class UserServiceImplTest {
         SecurityContextHolder.setContext(mockContext);
         when(mockContext.getAuthentication()).thenReturn(auth);
         when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        when(passwordEncoder.matches(eq(newUserInfo.getPassword()), any(String.class))).thenReturn(true);
 
         // Act
         UserDTO updatedUser = subject.updateUser(newUserInfo);
@@ -210,6 +215,7 @@ public class UserServiceImplTest {
         expectedEx.expect(ResourceNotFoundException.class);
         UserUpdateDTO newUserInfo = new UserUpdateDTO(
                 UUID.fromString("00000000-0000-0000-0000-000000000009"),
+                "password",
                 "newpassword",
                 "newmail",
                 true
@@ -232,6 +238,7 @@ public class UserServiceImplTest {
         // Arrange
         UserUpdateDTO newUserInfo = new UserUpdateDTO(
                 testUser2.getId(),
+                testUser2.getPassword(),
                 "newpassword",
                 "newmail",
                 true

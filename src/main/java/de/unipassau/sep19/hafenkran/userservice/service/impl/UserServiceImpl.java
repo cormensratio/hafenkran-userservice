@@ -32,8 +32,8 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    @NonNull
+    private final PasswordEncoder passwordEncoder;
 
     @NonNull
     private final UserRepository userRepository;
@@ -142,10 +142,7 @@ public class UserServiceImpl implements UserService {
         return UserDTO.fromUser(userToUpdate);
     }
 
-    private boolean isPasswordMatching(String encodedPassword, String passwordToCheck) {
-        if (encodedPassword != null && passwordToCheck != null) {
-            return passwordEncoder.matches(passwordToCheck, encodedPassword);
-        }
-        return false;
+    private boolean isPasswordMatching(@NonNull String encodedPassword, @NonNull String passwordToCheck) {
+        return passwordEncoder.matches(passwordToCheck, encodedPassword);
     }
 }
