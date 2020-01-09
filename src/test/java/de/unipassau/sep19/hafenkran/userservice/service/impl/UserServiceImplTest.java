@@ -178,6 +178,7 @@ public class UserServiceImplTest {
         SecurityContextHolder.setContext(mockContext);
         when(mockContext.getAuthentication()).thenReturn(auth);
         when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
         when(passwordEncoder.matches(eq(newUserInfo.getPassword()), any(String.class))).thenReturn(true);
         when(passwordEncoder.encode(newUserInfo.getNewPassword())).thenReturn("encodedNewPassword");
 
@@ -190,6 +191,7 @@ public class UserServiceImplTest {
         assertFalse(updatedUser.isAdmin());
         verify(mockContext, times(2)).getAuthentication();
         verify(userRepository, times(1)).findById(testUser.getId());
+        verify(userRepository, times(1)).save(any(User.class));
         verifyNoMoreInteractions(mockContext, userRepository);
     }
 
