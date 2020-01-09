@@ -179,6 +179,7 @@ public class UserServiceImplTest {
         when(mockContext.getAuthentication()).thenReturn(auth);
         when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
         when(passwordEncoder.matches(eq(newUserInfo.getPassword()), any(String.class))).thenReturn(true);
+        when(passwordEncoder.encode(newUserInfo.getNewPassword())).thenReturn("encodedNewPassword");
 
         // Act
         UserDTO updatedUser = subject.updateUser(newUserInfo);
