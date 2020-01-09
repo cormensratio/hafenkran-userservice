@@ -4,6 +4,7 @@ import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
@@ -12,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import javax.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -80,4 +84,16 @@ public class UserController {
         }
     }
 
+
+    /**
+     * Updates the given user
+     *
+     * @param newUserInfo the DTO that holds the new user info
+     * @return a {@link UserDTO} containing the details of the updated user
+     */
+    @PostMapping("/update")
+    @ResponseBody
+    public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo) {
+        return userService.updateUser(newUserInfo);
+    }
 }

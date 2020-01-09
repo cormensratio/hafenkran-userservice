@@ -4,10 +4,12 @@ import de.unipassau.sep19.hafenkran.userservice.config.JwtAuthentication;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundException;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.repository.UserRepository;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
+import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -129,4 +130,55 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO) {
+        UUID id = updateUserDTO.getId();
+        User targetUser = userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(User.class, "id", id.toString()));
+
+        boolean currentUserIsAdmin = SecurityContextUtil.getCurrentUserDTO().isAdmin();
+
+        if (!id.equals(SecurityContextUtil.getCurrentUserDTO().getId()) && !currentUserIsAdmin) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "Only admins are allowed update other users!");
+        }
+
+        if (!currentUserIsAdmin) {
+            if (!isPasswordMatching(targetUser.getPassword(), updateUserDTO.getPassword())) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "The given user password is not correct!");
+            }
+        }
+
+        // set admin flag of updated user only if the user that updates it is an admin
+        boolean isAdmin = targetUser.isAdmin();
+        if (currentUserIsAdmin) {
+            isAdmin = updateUserDTO.isAdmin();
+        }
+
+        String password = targetUser.getPassword();
+        if (!updateUserDTO.getNewPassword().equals("")) {
+            password = passwordEncoder.encode(updateUserDTO.getNewPassword());
+        }
+
+        targetUser.setPassword(password);
+        targetUser.setEmail(updateUserDTO.getEmail());
+        targetUser.setAdmin(isAdmin);
+
+        userRepository.save(targetUser);
+        return UserDTO.fromUser(targetUser);
+    }
+
+    /**
+     * Checks if two passwords, one encoded, the other in plain text are matching
+     * @param encodedPassword the encoded password
+     * @param plaintextPassword the plain text password
+     * @return if passwords are matching
+     */
+    private boolean isPasswordMatching(@NonNull String encodedPassword, @NonNull String plaintextPassword) {
+        return passwordEncoder.matches(plaintextPassword, encodedPassword);
+    }
 }
