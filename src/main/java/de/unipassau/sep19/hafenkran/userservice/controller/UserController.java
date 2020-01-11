@@ -37,7 +37,6 @@ public class UserController {
      */
     @GetMapping("/me")
     @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
     public UserDTO me() {
         return userService.getUserDTOForCurrentUser();
     }
@@ -82,6 +81,7 @@ public class UserController {
         }
     }
 
+
     /**
      * Updates the given user
      *
@@ -106,5 +106,22 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserDTO setUserStatus(@RequestParam @NonNull UUID id) {
         return userService.setUserStatus(id);
+    }
+
+    /**
+     * POST-Endpoint to delete one or more users. This endpoint is only available for admins.
+     *
+     * @param ids The ids of the users to be deleted.
+     * @return A {@link UserDTO}List of the users that were deleted.
+     */
+    @PostMapping("/delete")
+    @ResponseBody
+    public List<UserDTO> deleteUser(@RequestParam(name = "ids") List<UUID> ids) {
+        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
+        if (currentUser.isAdmin()) {
+            return userService.deleteUser(ids);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to delete users");
+        }
     }
 }
