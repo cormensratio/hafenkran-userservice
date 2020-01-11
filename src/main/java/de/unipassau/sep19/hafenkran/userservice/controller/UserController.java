@@ -3,8 +3,8 @@ package de.unipassau.sep19.hafenkran.userservice.controller;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
-import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
+import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
@@ -13,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import javax.validation.Valid;
-import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -95,5 +92,22 @@ public class UserController {
     @ResponseBody
     public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo) {
         return userService.updateUser(newUserInfo);
+    }
+
+    /**
+     * POST-Endpoint to delete one or more users. This endpoint is only available for admins.
+     *
+     * @param ids The ids of the users to be deleted.
+     * @return A {@link UserDTO}List of the users that were deleted.
+     */
+    @PostMapping("/delete")
+    @ResponseBody
+    public List<UserDTO> deleteUser(@RequestParam(name = "ids") List<UUID> ids) {
+        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
+        if (currentUser.isAdmin()) {
+            return userService.deleteUser(ids);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to delete users");
+        }
     }
 }

@@ -89,6 +89,21 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    public List<UserDTO> deleteUser(@NonNull List<UUID> ids) {
+        if (ids.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "You selected no users to be deleted.");
+        }
+        List<User> deletedUsers = userRepository.findByIdIn(ids);
+        List<UserDTO> deletedUsersDTO = UserDTO.convertUserListToDTOList(deletedUsers);
+
+        userRepository.deleteUserByIdIn(ids);
+        return deletedUsersDTO;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UserDTO registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO) {
         User user = registerNewUser(
                 User.fromUserCreateDTO(userCreateDTO, passwordEncoder.encode(userCreateDTO.getPassword())));
