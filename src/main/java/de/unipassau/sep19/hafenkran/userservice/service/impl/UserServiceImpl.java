@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO) {
         User user = registerNewUser(
                 User.fromUserCreateDTO(userCreateDTO, passwordEncoder.encode(userCreateDTO.getPassword())));
-        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.isAdmin());
+        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getStatus(), user.isAdmin());
     }
 
     /**
@@ -170,6 +170,21 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(targetUser);
         return UserDTO.fromUser(targetUser);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserDTO setUserStatus(@NonNull UUID id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(User.class, "id", id.toString()));
+        if (user.getStatus() == User.Status.ACTIVE) {
+            user.setStatus(User.Status.INACTIVE);
+        } else {
+            user.setStatus(User.Status.ACTIVE);
+        }
+        return UserDTO.fromUser(user);
     }
 
     /**

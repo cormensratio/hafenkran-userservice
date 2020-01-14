@@ -2,8 +2,8 @@ package de.unipassau.sep19.hafenkran.userservice.service;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
-import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -80,5 +80,15 @@ public interface UserService extends UserDetailsService {
      * @return the {@link UserDTO} of the updated user
      */
     UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO);
+
+    /**
+     * Updates the status of the user with the {@code id}.
+     * If it was {@link User.Status}.INACTIVE the status will now be {@link User.Status}.ACTIVE.
+     * If it was {@link User.Status}.ACTIVE the status will now be {@link User.Status}.INACTIVE.
+     *
+     * @param id The user which status should be changed.
+     * @return The {@link UserDTO} of the user with the changed status.
+     */
+    UserDTO setUserStatus(@NonNull UUID id);
 
 }
