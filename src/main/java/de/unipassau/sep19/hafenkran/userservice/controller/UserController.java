@@ -37,6 +37,7 @@ public class UserController {
      */
     @GetMapping("/me")
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public UserDTO me() {
         return userService.getUserDTOForCurrentUser();
     }
@@ -51,7 +52,7 @@ public class UserController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public UserDTO createNewUser(@NonNull @RequestBody
-                              @Valid UserCreateDTO userCreateDTO) {
+                                 @Valid UserCreateDTO userCreateDTO) {
         UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
         if (currentUser.isAdmin()) {
             return userService.registerNewUser(userCreateDTO);
@@ -80,7 +81,6 @@ public class UserController {
             return userService.retrieveUserInformation(ids);
         }
     }
-
 
     /**
      * Updates the given user
