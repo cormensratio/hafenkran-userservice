@@ -55,7 +55,7 @@ public class JwtTokenUtil implements Serializable {
                     UUID.fromString(userInformation.get("id").toString()),
                     userInformation.get("name").toString(),
                     userInformation.get("email").toString(),
-                    (User.Status) userInformation.get("status"),
+                    User.Status.ACTIVE,
                     userInformation.get("isAdmin").toString().equals("true")
             );
         } catch (RequiredTypeException | IllegalArgumentException e) {
