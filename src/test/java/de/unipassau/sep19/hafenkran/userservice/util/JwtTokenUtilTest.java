@@ -1,6 +1,7 @@
 package de.unipassau.sep19.hafenkran.userservice.util;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.model.User;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import org.junit.Before;
@@ -19,7 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class JwtTokenUtilTest {
 
     private static final UserDTO USER_DTO = new UserDTO(UUID.fromString("00000000-0000-0000-0000-000000000001"), "Rick",
-            "", false);
+            "", User.Status.ACTIVE, false);
+
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
     private String jwt;

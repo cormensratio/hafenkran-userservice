@@ -177,15 +177,21 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDTO setUserStatus(@NonNull UUID id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(User.class, "id", id.toString()));
-        if (user.getStatus() == User.Status.ACTIVE) {
-            user.setStatus(User.Status.INACTIVE);
+        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
+        if (currentUser.isAdmin()) {
+            User user = userRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException(User.class, "id", id.toString()));
+            if (user.getStatus() == User.Status.ACTIVE) {
+                user.setStatus(User.Status.INACTIVE);
+            } else {
+                user.setStatus(User.Status.ACTIVE);
+            }
+            userRepository.save(user);
+            return UserDTO.fromUser(user);
         } else {
-            user.setStatus(User.Status.ACTIVE);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You are not allowed to change the status of the user.");
         }
-        userRepository.save(user);
-        return UserDTO.fromUser(user);
     }
 
     /**

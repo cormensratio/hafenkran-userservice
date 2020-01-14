@@ -40,14 +40,24 @@ public class UserServiceImplTest {
     private UserService subject;
     private User testUser;
     private User testUser2;
+    private User testUser3;
+    private User testAdmin;
 
     @Before
     public void setUp() {
         this.subject = new UserServiceImpl(userRepository, passwordEncoder);
         this.testUser = new User("testUser", "testPassword", "testMail", false);
         this.testUser2 = new User("testUser", "testPassword", "testMail", false);
+        this.testUser3 = new User("testUser", "testPassword", "testMail", false);
+        this.testAdmin = new User("testAdmin", "testPassword", "testMail", true);
         this.testUser.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         this.testUser2.setId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
+        this.testUser3.setId(UUID.fromString("00000000-0000-0000-0000-000000000003"));
+        this.testAdmin.setId(UUID.fromString("00000000-0000-0000-0000-000000000004"));
+        this.testUser.setStatus(User.Status.ACTIVE);
+        this.testUser2.setStatus(User.Status.ACTIVE);
+        this.testUser3.setStatus(User.Status.INACTIVE);
+        this.testAdmin.setStatus(User.Status.ACTIVE);
     }
 
     @Test
@@ -241,5 +251,89 @@ public class UserServiceImplTest {
         subject.updateUser(newUserInfo);
 
         // Assert - with rule
+    }
+
+    @Test
+    public void testSetUserStatus_existingUserWithActiveStatusAndAdminIsTrue_statusSuccessfullyChanged() {
+        // Arrange
+        UserDTO userDTO = UserDTO.fromUser(testAdmin);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        when(userRepository.save(any(User.class))).thenReturn(testUser3);
+
+        // Act
+        UserDTO actual = subject.setUserStatus(testUser.getId());
+
+        // Assert
+        assertEquals(actual.getStatus(), testUser3.getStatus());
+        assertTrue(userDTO.isAdmin());
+        verify(userRepository, times(1)).findById(testUser.getId());
+        verify(userRepository, times(1)).save(testUser);
+    }
+
+    @Test
+    public void testSetUserStatus_existingUserWithInactiveStatusAndAdminIsTrue_statusSuccesfullyChanged() {
+        // Arrange
+        UserDTO userDTO = UserDTO.fromUser(testAdmin);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+        when(userRepository.findById(testUser3.getId())).thenReturn(Optional.of(testUser3));
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+
+        // Act
+        UserDTO actual = subject.setUserStatus(testUser3.getId());
+
+        // Assert
+        assertEquals(actual.getStatus(), testUser.getStatus());
+        assertTrue(userDTO.isAdmin());
+        verify(userRepository, times(1)).findById(testUser3.getId());
+        verify(userRepository, times(1)).save(testUser3);
+    }
+
+
+    @Test
+    public void testSetUserStatus_nonExistingUserAndAdminIsTrue_throwsException() {
+        // Arrange
+        expectedEx.expect(ResourceNotFoundException.class);
+
+        UserDTO userDTO = UserDTO.fromUser(testAdmin);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+
+        // Act
+        UserDTO actual = subject.setUserStatus(UUID.fromString("00000000-0000-0000-0000-000000000009"));
+
+        // Assert - with rule
+
+    }
+
+    @Test
+    public void testSetUserStatus_existingUserAndAdminIsFalse_throwsException() {
+        // Arrange
+        expectedEx.expect(ResponseStatusException.class);
+        expectedEx.expectMessage("You are not allowed to change the status of the user.");
+
+        UserDTO userDTO = UserDTO.fromUser(testUser);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+
+        // Act
+        UserDTO actual = subject.setUserStatus(testUser2.getId());
+
+        // Assert - with rule
+
     }
 }

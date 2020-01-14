@@ -18,7 +18,7 @@ public class UserDTOTest {
         UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
         User user = new User("testUser", "pw", "testMail", false);
         user.setId(userId);
-        UserDTO expected = new UserDTO(userId, "testUser", "testMail", false);
+        UserDTO expected = new UserDTO(userId, "testUser", "testMail", User.Status.ACTIVE, false);
 
         // Act
         UserDTO actual = UserDTO.fromUser(user);

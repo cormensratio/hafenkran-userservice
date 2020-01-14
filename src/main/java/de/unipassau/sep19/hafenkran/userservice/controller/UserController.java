@@ -105,11 +105,6 @@ public class UserController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public UserDTO setUserStatus(@RequestParam @NonNull UUID id) {
-        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
-        if (currentUser.isAdmin()) {
-            return userService.setUserStatus(id);
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to change the status of the user.");
-        }
+        return userService.setUserStatus(id);
     }
 }

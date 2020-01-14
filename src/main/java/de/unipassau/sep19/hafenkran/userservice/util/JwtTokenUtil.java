@@ -2,6 +2,7 @@ package de.unipassau.sep19.hafenkran.userservice.util;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.exception.InvalidJwtException;
+import de.unipassau.sep19.hafenkran.userservice.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.RequiredTypeException;
@@ -54,6 +55,7 @@ public class JwtTokenUtil implements Serializable {
                     UUID.fromString(userInformation.get("id").toString()),
                     userInformation.get("name").toString(),
                     userInformation.get("email").toString(),
+                    (User.Status) userInformation.get("status"),
                     userInformation.get("isAdmin").toString().equals("true")
             );
         } catch (RequiredTypeException | IllegalArgumentException e) {
