@@ -27,8 +27,8 @@ public class JwtTokenUtilTest {
 
     @Before
     public void setUp() {
-        this.subject = new JwtTokenUtil(18000L, "MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB");
-        this.jwt = subject.generateToken(USER_DTO);
+        this.subject = new JwtTokenUtil(18000L, 18000L,"MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB");
+        this.jwt = subject.generateAuthToken(USER_DTO);
     }
 
     @Test
@@ -91,8 +91,8 @@ public class JwtTokenUtilTest {
         // Arrange
         expectedEx.expect(ExpiredJwtException.class);
 
-        JwtTokenUtil subject = new JwtTokenUtil(-1000L, "MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB");
-        jwt = subject.generateToken(USER_DTO);
+        JwtTokenUtil subject = new JwtTokenUtil(-1000L,-1000L, "MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB");
+        jwt = subject.generateAuthToken(USER_DTO);
 
         // Act
         boolean actual = subject.validateToken(jwt);

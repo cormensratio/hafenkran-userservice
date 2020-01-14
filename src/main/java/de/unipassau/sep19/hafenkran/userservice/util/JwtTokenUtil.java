@@ -19,13 +19,18 @@ import java.util.function.Function;
 @Component
 public class JwtTokenUtil implements Serializable {
 
-    private final Long jwtTokenValidity;
-
     private final String jwtSecret;
 
-    public JwtTokenUtil(@Value("${jwt.validity}") Long jwtTokenValidity, @Value("${jwt.secret}") String jwtSecret) {
-        this.jwtTokenValidity = jwtTokenValidity;
+    private Long jwtAuthTokenValidity;
+
+    private Long jwtRefreshTokenValidity;
+
+    public JwtTokenUtil(@Value("${jwt.auth-validity}")
+                                Long jwtAuthTokenValidity, @Value("${jwt.refresh-validity}")
+                                Long jwtRefreshTokenValidity, @Value("${jwt.secret}") String jwtSecret) {
         this.jwtSecret = jwtSecret;
+        this.jwtAuthTokenValidity = jwtAuthTokenValidity;
+        this.jwtRefreshTokenValidity = jwtRefreshTokenValidity;
     }
 
     /**
@@ -87,29 +92,36 @@ public class JwtTokenUtil implements Serializable {
      * @param userDTO the {@link UserDTO} with the information of the current user
      * @return a String with the newly generated JWT
      */
-    public String generateToken(@NonNull @Valid UserDTO userDTO) {
+    private String generateToken(@NonNull @Valid UserDTO userDTO, @NonNull @NotEmpty Long tokenValiditySeconds) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("user", userDTO);
-        return doGenerateToken(claims, userDTO.getId().toString());
+        return doGenerateToken(claims, userDTO.getId().toString(), tokenValiditySeconds);
     }
 
-    private String doGenerateToken(Map<String, Object> claims, @NonNull @NotEmpty String subject) {
+    private String doGenerateToken(Map<String, Object> claims, @NonNull @NotEmpty String subject, @NonNull @NotEmpty Long tokenValiditySeconds) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenValidity * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenValiditySeconds * 1000))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
     }
 
     /**
      * Validates the JWT whether it is expired
      *
-     * @param token   the JWT
+     * @param token the JWT
      * @return {@code true} if token is valid
      */
     public Boolean validateToken(@NonNull @NotEmpty String token) {
         return !isTokenExpired(token);
     }
 
+    public String generateAuthToken(UserDTO userDto) {
+        return generateToken(userDto, jwtAuthTokenValidity);
+    }
+
+    public String generateRefreshToken() {
+        return generateToken(SecurityContextUtil.getCurrentUserDTO(), jwtRefreshTokenValidity);
+    }
 }
