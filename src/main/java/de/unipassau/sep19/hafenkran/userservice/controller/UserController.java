@@ -109,17 +109,17 @@ public class UserController {
     }
 
     /**
-     * POST-Endpoint to delete one or more users. This endpoint is only available for admins.
+     * POST-Endpoint to delete one user. This endpoint is only available for admins.
      *
-     * @param ids The ids of the users to be deleted.
-     * @return A {@link UserDTO}List of the users that were deleted.
+     * @param id The id of the user to be deleted.
+     * @return A {@link UserDTO} of the user that was deleted.
      */
     @PostMapping("/delete")
     @ResponseBody
-    public List<UserDTO> deleteUser(@RequestParam(name = "ids") List<UUID> ids) {
+    public UserDTO deleteUser(@RequestParam(name = "id") UUID id) {
         UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
         if (currentUser.isAdmin()) {
-            return userService.deleteUser(ids);
+            return userService.deleteUser(id);
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to delete users");
         }

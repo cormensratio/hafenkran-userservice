@@ -89,15 +89,13 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserDTO> deleteUser(@NonNull List<UUID> ids) {
-        if (ids.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "You selected no users to be deleted.");
-        }
-        List<User> deletedUsers = userRepository.findByIdIn(ids);
-        List<UserDTO> deletedUsersDTO = UserDTO.convertUserListToDTOList(deletedUsers);
+    public UserDTO deleteUser(@NonNull UUID id) {
+        User deletedUser = userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(User.class, "id", id.toString()));
+        UserDTO deletedUserDTO = UserDTO.fromUser(deletedUser);
 
-        userRepository.deleteUserByIdIn(ids);
-        return deletedUsersDTO;
+        userRepository.deleteUserById(id);
+        return deletedUserDTO;
     }
 
     /**

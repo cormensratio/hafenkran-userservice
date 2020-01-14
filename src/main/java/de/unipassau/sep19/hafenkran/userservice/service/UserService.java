@@ -43,12 +43,12 @@ public interface UserService extends UserDetailsService {
     UserDTO getUserDTOFromUserId(@NonNull UUID userId);
 
     /**
-     * Deletes the users with their code within the {@code ids}.
+     * Deletes the user with the {@code id}.
      *
-     * @param ids The ids of the users to be deleted.
-     * @return A {@link UserDTO}List of the deleted users.
+     * @param id The id of the user to be deleted.
+     * @return A {@link UserDTO} of the deleted user.
      */
-    List<UserDTO> deleteUser(@NonNull List<UUID> ids);
+    UserDTO deleteUser(@NonNull UUID id);
 
     /**
      * Creates and saves a new user.
