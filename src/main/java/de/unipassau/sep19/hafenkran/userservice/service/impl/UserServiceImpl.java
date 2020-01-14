@@ -184,6 +184,7 @@ public class UserServiceImpl implements UserService {
         } else {
             user.setStatus(User.Status.ACTIVE);
         }
+        userRepository.save(user);
         return UserDTO.fromUser(user);
     }
 
