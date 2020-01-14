@@ -96,7 +96,7 @@ public class UserController {
     }
 
     /**
-     * POST-Endpoint for updating the status of an user. This endpoint is only available for admins.
+     * POST-Endpoint for updating the status of an user.
      *
      * @param id The id of the user which status should be updated.
      * @return An {@link UserDTO} of the user with the changed status.
@@ -105,7 +105,13 @@ public class UserController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public UserDTO setUserStatus(@RequestParam @NonNull UUID id) {
-        return userService.setUserStatus(id);
+        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
+        if (currentUser.isAdmin()) {
+            return userService.setUserStatus(id);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You are not allowed to change the status of the user.");
+        }
     }
 
     /**
