@@ -3,8 +3,8 @@ package de.unipassau.sep19.hafenkran.userservice.controller;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
-import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
+import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
@@ -13,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import javax.validation.Valid;
-import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -40,6 +37,7 @@ public class UserController {
      */
     @GetMapping("/me")
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public UserDTO me() {
         return userService.getUserDTOForCurrentUser();
     }
@@ -84,7 +82,6 @@ public class UserController {
         }
     }
 
-
     /**
      * Updates the given user
      *
@@ -93,7 +90,26 @@ public class UserController {
      */
     @PostMapping("/update")
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo) {
         return userService.updateUser(newUserInfo);
+    }
+
+    /**
+     * POST-Endpoint for updating the status of an user. This endpoint is only available for admins.
+     *
+     * @param id The id of the user which status should be updated.
+     * @return An {@link UserDTO} of the user with the changed status.
+     */
+    @PostMapping("/updateStatus")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public UserDTO setUserStatus(@RequestParam @NonNull UUID id) {
+        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
+        if (currentUser.isAdmin()) {
+            return userService.setUserStatus(id);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to change the status of the user.");
+        }
     }
 }
