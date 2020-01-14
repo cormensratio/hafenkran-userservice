@@ -105,13 +105,7 @@ public class UserController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public UserDTO setUserStatus(@RequestParam @NonNull UUID id) {
-        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
-        if (currentUser.isAdmin()) {
-            return userService.setUserStatus(id);
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "You are not allowed to change the status of the user.");
-        }
+        return userService.setUserStatus(id);
     }
 
     /**
@@ -123,11 +117,6 @@ public class UserController {
     @PostMapping("/delete")
     @ResponseBody
     public UserDTO deleteUser(@RequestParam(name = "id") UUID id) {
-        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
-        if (currentUser.isAdmin()) {
-            return userService.deleteUser(id);
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to delete users");
-        }
+        return userService.deleteUser(id);
     }
 }
