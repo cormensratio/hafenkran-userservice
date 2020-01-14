@@ -13,10 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -38,7 +35,7 @@ public class AuthController {
     private final UserService userService;
 
     /**
-     * A POST-Endpoint requiring a {@link AuthRequestDTO} for generating the JWT.
+     * A POST-Endpoint requiring a {@link AuthRequestDTO} for generating the JWT refresh token used for requesting a new auth token.
      *
      * @param authenticationRequest the users {@link AuthRequestDTO}
      * @return a {@link AuthResponseDTO} including the newly generated token
@@ -47,7 +44,7 @@ public class AuthController {
     public ResponseEntity<?> createAuthenticationToken(@RequestBody @Valid AuthRequestDTO authenticationRequest) {
         authenticate(authenticationRequest.getName(), authenticationRequest.getPassword());
         UserDTO userDto = userService.getUserDTOFromUserName(authenticationRequest.getName());
-        final String token = jwtTokenUtil.generateToken(userDto);
+        final String token = jwtTokenUtil.generateAuthToken(userDto);
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }
 
@@ -60,6 +57,17 @@ public class AuthController {
             throw new RuntimeException("INVALID_CREDENTIALS", e);
 
         }
+    }
+
+    /**
+     * A GET-Endpoint for generating the JWT auth token sent with every request.
+     *
+     * @return a {@link AuthResponseDTO} including the newly generated token
+     */
+    @GetMapping("/refresh")
+    public ResponseEntity<?> refreshAuthToken() {
+        final String token = jwtTokenUtil.generateRefreshToken();
+        return ResponseEntity.ok(new AuthResponseDTO(token));
     }
 
 }

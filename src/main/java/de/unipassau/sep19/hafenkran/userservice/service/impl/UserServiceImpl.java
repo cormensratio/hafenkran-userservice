@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO) {
         User user = registerNewUser(
                 User.fromUserCreateDTO(userCreateDTO, passwordEncoder.encode(userCreateDTO.getPassword())));
-        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getStatus(), user.isAdmin());
+        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.isAdmin());
     }
 
     /**
