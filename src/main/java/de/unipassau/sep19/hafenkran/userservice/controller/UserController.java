@@ -96,7 +96,7 @@ public class UserController {
     }
 
     /**
-     * POST-Endpoint for updating the status of an user.
+     * POST-Endpoint for updating the status of an user. This endpoint is only available for admins.
      *
      * @param id The id of the user which status should be updated.
      * @return An {@link UserDTO} of the user with the changed status.
