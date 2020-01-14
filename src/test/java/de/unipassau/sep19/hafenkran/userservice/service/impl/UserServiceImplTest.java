@@ -264,7 +264,7 @@ public class UserServiceImplTest {
         assertEquals(actual.getId(), testUser.getId());
         assertTrue(userDTO.isAdmin());
         verify(userRepository, times(1)).findById(testUser.getId());
-        verify(userRepository, times(1)).deleteUserById(testUser.getId());
+        verify(userRepository, times(1)).deleteById(testUser.getId());
     }
 
 
