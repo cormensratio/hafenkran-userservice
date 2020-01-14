@@ -89,6 +89,24 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    public UserDTO deleteUser(@NonNull UUID id) {
+        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
+        if (currentUser.isAdmin()) {
+            User deletedUser = userRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException(User.class, "id", id.toString()));
+            UserDTO deletedUserDTO = UserDTO.fromUser(deletedUser);
+
+            userRepository.deleteById(id);
+            return deletedUserDTO;
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only admins are allowed to delete users.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UserDTO registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO) {
         User user = registerNewUser(
                 User.fromUserCreateDTO(userCreateDTO, passwordEncoder.encode(userCreateDTO.getPassword())));
