@@ -103,11 +103,6 @@ public class UserController {
     @PostMapping("/delete")
     @ResponseBody
     public UserDTO deleteUser(@RequestParam(name = "id") UUID id) {
-        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
-        if (currentUser.isAdmin()) {
-            return userService.deleteUser(id);
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to delete users");
-        }
+        return userService.deleteUser(id);
     }
 }
