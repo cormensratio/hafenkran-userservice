@@ -19,6 +19,6 @@ public interface UserRepository extends CrudRepository<User, UUID> {
 
     List<User> findByIdIn(List<UUID> ids);
 
-    void deleteUserById(UUID id);
+    void deleteById(UUID id);
 
 }

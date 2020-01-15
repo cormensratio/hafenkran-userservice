@@ -255,6 +255,7 @@ public class UserServiceImplTest {
 
     @Test
     public void testSetUserStatus_existingUserWithActiveStatusAndAdminIsTrue_statusSuccessfullyChanged() {
+
         // Arrange
         UserDTO userDTO = UserDTO.fromUser(testAdmin);
         SecurityContext mockContext = mock(SecurityContext.class);
@@ -296,10 +297,69 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findById(testUser3.getId());
         verify(userRepository, times(1)).save(testUser3);
     }
+    
+    @Test
+    public void testDeleteUser_existingUserAndAdminIsTrue_userSuccessfullyDeleted() {
+        
+        // Arrange
+        UserDTO userDTO = UserDTO.fromUser(testAdmin);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
 
+        when(mockContext.getAuthentication()).thenReturn(auth);
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        
+        // Act
+        UserDTO actual = subject.deleteUser(testUser.getId());
+
+        // Assert
+        assertEquals(actual.getId(), testUser.getId());
+        assertTrue(userDTO.isAdmin());
+        verify(userRepository, times(1)).findById(testUser.getId());
+        verify(userRepository, times(1)).deleteById(testUser.getId());
+    }
+
+    @Test
+    public void testDeleteUser_nonExistingUserAndAdminIsTrue_throwsException() {
+        // Arrange
+        expectedEx.expect(ResourceNotFoundException.class);
+
+        UserDTO userDTO = UserDTO.fromUser(testAdmin);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+
+        // Act
+        UserDTO actual = subject.deleteUser(UUID.fromString("00000000-0000-0000-0000-000000000009"));
+
+        // Assert - with rule
+    }
+
+    @Test
+    public void testDeleteUser_deleteExistingUserAsNonAdmin_throwsException() {
+        // Arrange
+        expectedEx.expect(ResponseStatusException.class);
+        expectedEx.expectMessage("Only admins are allowed to delete users.");
+        
+        UserDTO userDTO = UserDTO.fromUser(testUser);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+
+        // Act
+        UserDTO actual = subject.deleteUser(testUser2.getId());
+
+        // Assert - with rule
+    }
 
     @Test
     public void testSetUserStatus_nonExistingUserAndAdminIsTrue_throwsException() {
+
         // Arrange
         expectedEx.expect(ResourceNotFoundException.class);
 

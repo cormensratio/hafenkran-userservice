@@ -91,17 +91,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO deleteUser(@NonNull UUID id) {
         UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
-        if (!currentUser.isAdmin()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "You are not allowed to change the status of the user.");
+        if (currentUser.isAdmin()) {
+            User deletedUser = userRepository.findById(id).orElseThrow(
+                    () -> new ResourceNotFoundException(User.class, "id", id.toString()));
+            UserDTO deletedUserDTO = UserDTO.fromUser(deletedUser);
+
+            userRepository.deleteById(id);
+            return deletedUserDTO;
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only admins are allowed to delete users.");
         }
-
-        User deletedUser = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(User.class, "id", id.toString()));
-        UserDTO deletedUserDTO = UserDTO.fromUser(deletedUser);
-
-        userRepository.deleteUserById(id);
-        return deletedUserDTO;
     }
 
     /**
