@@ -116,6 +116,7 @@ public class UserController {
      */
     @PostMapping("/delete")
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public UserDTO deleteUser(@RequestParam(name = "id") UUID id) {
         return userService.deleteUser(id);
     }

@@ -199,7 +199,7 @@ public class UserServiceImplTest {
         assertEquals(updatedUser.getId(), testUser.getId());
         assertEquals(updatedUser.getEmail(), newUserInfo.getEmail());
         assertFalse(updatedUser.isAdmin());
-        verify(mockContext, times(2)).getAuthentication();
+        verify(mockContext, times(1)).getAuthentication();
         verify(userRepository, times(1)).findById(testUser.getId());
         verify(userRepository, times(1)).save(any(User.class));
         verifyNoMoreInteractions(mockContext, userRepository);
