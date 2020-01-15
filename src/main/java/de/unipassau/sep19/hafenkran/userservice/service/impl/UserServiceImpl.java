@@ -101,7 +101,8 @@ public class UserServiceImpl implements UserService {
                 userRepository.deleteById(id);
                 return deletedUserDTO;
             } else {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "You are not allowed to delete your own account. Please contact another admin to do so.");
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "You are not allowed to delete your own account. Please contact another admin to do so.");
             }
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only admins are allowed to delete users.");
