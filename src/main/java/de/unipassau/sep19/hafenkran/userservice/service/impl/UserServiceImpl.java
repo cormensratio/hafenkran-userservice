@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
 
         // Change status if the currentUser is an admin and to change the status was selected
         if (status != targetUser.getStatus() && currentUserIsAdmin) {
-            setUserStatus(targetUser);
+            targetUser.setStatus(status);
         } else if (status != targetUser.getStatus()) { // Statuschange was selected, but it wasn't an admin
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                     "You are not allowed to change the status of the user.");
@@ -199,28 +199,6 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(targetUser);
         return UserDTO.fromUser(targetUser);
-    }
-
-
-    /**
-     * Updates the status of the {@code user}.
-     * If it was {@link User.Status}.INACTIVE the status will now be {@link User.Status}.ACTIVE.
-     * If it was {@link User.Status}.ACTIVE the status will now be {@link User.Status}.INACTIVE.
-     *
-     * @param user The user which status should be changed.
-     */
-    private void setUserStatus(@NonNull User user) {
-        switch (user.getStatus()) {
-            case ACTIVE:
-                user.setStatus(User.Status.INACTIVE);
-                break;
-            case INACTIVE:
-                user.setStatus(User.Status.ACTIVE);
-                break;
-            default:
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There was no status found.");
-
-        }
     }
 
     /**

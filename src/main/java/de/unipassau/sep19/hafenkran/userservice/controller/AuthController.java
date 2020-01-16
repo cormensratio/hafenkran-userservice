@@ -64,7 +64,7 @@ public class AuthController {
 
         // Check if the useraccount has the permission to use the system
         UserDTO userDTO = userService.getUserDTOFromUserName(username);
-        if (!userDTO.getStatus().equals(User.Status.ACTIVE)) {
+        if (userDTO.getStatus() != User.Status.ACTIVE) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You have no permission from an admin to use the system.");
         }
     }
@@ -78,8 +78,8 @@ public class AuthController {
     public ResponseEntity<?> refreshAuthToken() {
 
         // Check if the useraccount has the permission to use the system
-        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
-        if (currentUser.getStatus() == User.Status.INACTIVE) {
+        UserDTO currentUser = userService.getUserDTOFromUserName(SecurityContextUtil.getCurrentUserDTO().getName());
+        if (currentUser.getStatus() != User.Status.ACTIVE) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You have no permission to use the system.");
         }
 
