@@ -94,10 +94,16 @@ public class UserServiceImpl implements UserService {
         if (currentUser.isAdmin()) {
             User deletedUser = userRepository.findById(id).orElseThrow(
                     () -> new ResourceNotFoundException(User.class, "id", id.toString()));
-            UserDTO deletedUserDTO = UserDTO.fromUser(deletedUser);
 
-            userRepository.deleteById(id);
-            return deletedUserDTO;
+            // Only delete the account if it isn't the account from the current user
+            if (currentUser.getId() != id) {
+                UserDTO deletedUserDTO = UserDTO.fromUser(deletedUser);
+                userRepository.deleteById(id);
+                return deletedUserDTO;
+            } else {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "You are not allowed to delete your own account. Please contact another admin to do so.");
+            }
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Only admins are allowed to delete users.");
         }

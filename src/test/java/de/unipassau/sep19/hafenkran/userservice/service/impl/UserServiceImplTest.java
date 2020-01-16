@@ -443,4 +443,25 @@ public class UserServiceImplTest {
         // Assert - with rule
     }
 
+    @Test
+    public void testDeleteUser_deleteOwnAccountAsAdmin_throwsException() {
+        // Arrange
+        expectedEx.expect(ResponseStatusException.class);
+        expectedEx.expectMessage("You are not allowed to delete your own account. " +
+                "Please contact another admin to do so.");
+
+        UserDTO userDTO = UserDTO.fromUser(testAdmin);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+        when(userRepository.findById(testAdmin.getId())).thenReturn(Optional.of(testAdmin));
+
+        // Act
+        UserDTO actual = subject.deleteUser(testAdmin.getId());
+
+        // Assert - with rule
+
+    }
 }
