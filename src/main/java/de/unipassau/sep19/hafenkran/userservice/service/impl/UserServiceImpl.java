@@ -215,6 +215,7 @@ public class UserServiceImpl implements UserService {
                 break;
             case INACTIVE:
                 user.setStatus(User.Status.ACTIVE);
+                break;
             default:
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There was no status found.");
 
