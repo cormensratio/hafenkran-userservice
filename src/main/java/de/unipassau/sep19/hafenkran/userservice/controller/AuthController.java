@@ -6,6 +6,7 @@ import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import de.unipassau.sep19.hafenkran.userservice.util.JwtTokenUtil;
+import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,24 +47,25 @@ public class AuthController {
      */
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody @Valid AuthRequestDTO authenticationRequest) {
-        authenticate(authenticationRequest.getName(), authenticationRequest.getPassword(), authenticationRequest.getStatus());
+        authenticate(authenticationRequest.getName(), authenticationRequest.getPassword());
         UserDTO userDto = userService.getUserDTOFromUserName(authenticationRequest.getName());
         final String token = jwtTokenUtil.generateAuthToken(userDto);
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }
 
-    private void authenticate(@NonNull String username, @NonNull String password, @NonNull User.Status status) {
+    private void authenticate(@NonNull String username, @NonNull String password) {
         try {
-            if (status.equals(User.Status.ACTIVE)) {
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            } else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You have no permission from an admin to use the system.");
-            }
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
             throw new RuntimeException("USER_DISABLED", e);
         } catch (BadCredentialsException e) {
             throw new RuntimeException("INVALID_CREDENTIALS", e);
+        }
 
+        // Check if the useraccount has the permission to use the system
+        UserDTO userDTO = userService.getUserDTOFromUserName(username);
+        if (!userDTO.getStatus().equals(User.Status.ACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You have no permission from an admin to use the system.");
         }
     }
 
@@ -74,6 +76,13 @@ public class AuthController {
      */
     @GetMapping("/refresh")
     public ResponseEntity<?> refreshAuthToken() {
+
+        // Check if the useraccount has the permission to use the system
+        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
+        if (currentUser.getStatus() == User.Status.INACTIVE) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You have no permission to use the system.");
+        }
+
         final String token = jwtTokenUtil.generateRefreshToken();
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }

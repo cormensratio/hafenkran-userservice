@@ -92,8 +92,8 @@ public class UserController {
     @PostMapping("/update")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo, @RequestParam(name = "changeStatus", required = false) boolean changeStatus) {
-        return userService.updateUser(newUserInfo, changeStatus);
+    public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo) {
+        return userService.updateUser(newUserInfo);
     }
 
     /**

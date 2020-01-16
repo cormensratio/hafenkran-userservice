@@ -24,8 +24,4 @@ public class AuthRequestDTO implements Serializable {
     @JsonProperty("password")
     private final String password;
 
-    @NonNull
-    @NotBlank
-    @JsonProperty("status")
-    private final User.Status status;
 }

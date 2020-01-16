@@ -153,8 +153,9 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO, boolean changeStatus) {
+    public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO) {
         UUID id = updateUserDTO.getId();
+        User.Status status = updateUserDTO.getStatus();
         User targetUser = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", id.toString()));
 
@@ -174,9 +175,9 @@ public class UserServiceImpl implements UserService {
         }
 
         // Change status if the currentUser is an admin and to change the status was selected
-        if (changeStatus && currentUserIsAdmin) {
+        if (status != targetUser.getStatus() && currentUserIsAdmin) {
             setUserStatus(targetUser);
-        } else if (changeStatus) { // Statuschange was selected, but it wasn't an admin
+        } else if (status != targetUser.getStatus()) { // Statuschange was selected, but it wasn't an admin
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                     "You are not allowed to change the status of the user.");
         }
