@@ -83,29 +83,17 @@ public class UserController {
     }
 
     /**
-     * Updates the given user
+     * Updates the given user.
+     * The params, that can be updated, are the password, the email, the status and the adminFlag.
      *
-     * @param newUserInfo the DTO that holds the new user info
-     * @return a {@link UserDTO} containing the details of the updated user
+     * @param newUserInfo the DTO that holds the new user informations.
+     * @return A {@link UserDTO} containing the details of the updated user.
      */
     @PostMapping("/update")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo) {
-        return userService.updateUser(newUserInfo);
-    }
-
-    /**
-     * POST-Endpoint for updating the status of an user. This endpoint is only available for admins.
-     *
-     * @param id The id of the user which status should be updated.
-     * @return An {@link UserDTO} of the user with the changed status.
-     */
-    @PostMapping("/updateStatus")
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public UserDTO setUserStatus(@RequestParam @NonNull UUID id) {
-        return userService.setUserStatus(id);
+    public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo, @RequestParam(name = "changeStatus", required = false) boolean changeStatus) {
+        return userService.updateUser(newUserInfo, changeStatus);
     }
 
     /**

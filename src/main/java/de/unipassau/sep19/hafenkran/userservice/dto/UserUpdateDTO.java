@@ -2,6 +2,7 @@ package de.unipassau.sep19.hafenkran.userservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,10 @@ public class UserUpdateDTO {
     @NonNull
     @JsonProperty("email")
     private final String email;
+
+    @NonNull
+    @JsonProperty("status")
+    private final User.Status status;
 
     @JsonProperty("isAdmin")
     private final boolean isAdmin;

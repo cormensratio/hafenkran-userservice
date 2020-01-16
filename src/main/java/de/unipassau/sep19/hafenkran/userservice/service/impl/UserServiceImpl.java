@@ -153,7 +153,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO) {
+    public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO, boolean changeStatus) {
         UUID id = updateUserDTO.getId();
         User targetUser = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", id.toString()));
@@ -163,7 +163,7 @@ public class UserServiceImpl implements UserService {
 
         if (!id.equals(currentUserDTO.getId()) && !currentUserIsAdmin) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "Only admins are allowed update other users!");
+                    "Only admins are allowed to update other users!");
         }
 
         if (!currentUserIsAdmin) {
@@ -171,6 +171,14 @@ public class UserServiceImpl implements UserService {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                         "The given user password is not correct!");
             }
+        }
+
+        // Change status if the currentUser is an admin and to change the status was selected
+        if (changeStatus && currentUserIsAdmin) {
+            setUserStatus(targetUser);
+        } else if (changeStatus) { // Statuschange was selected, but it wasn't an admin
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You are not allowed to change the status of the user.");
         }
 
         // set admin flag of updated user only if the user that updates it is an admin
@@ -192,26 +200,25 @@ public class UserServiceImpl implements UserService {
         return UserDTO.fromUser(targetUser);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public UserDTO setUserStatus(@NonNull UUID id) {
-        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
-        if (!currentUser.isAdmin()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "You are not allowed to change the status of the user.");
-        }
 
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(User.class, "id", id.toString()));
-        if (user.getStatus() == User.Status.ACTIVE) {
-            user.setStatus(User.Status.INACTIVE);
-        } else {
-            user.setStatus(User.Status.ACTIVE);
+    /**
+     * Updates the status of the {@code user}.
+     * If it was {@link User.Status}.INACTIVE the status will now be {@link User.Status}.ACTIVE.
+     * If it was {@link User.Status}.ACTIVE the status will now be {@link User.Status}.INACTIVE.
+     *
+     * @param user The user which status should be changed.
+     */
+    private void setUserStatus(@NonNull User user) {
+        switch (user.getStatus()) {
+            case ACTIVE:
+                user.setStatus(User.Status.INACTIVE);
+                break;
+            case INACTIVE:
+                user.setStatus(User.Status.ACTIVE);
+            default:
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There was no status found.");
+
         }
-        userRepository.save(user);
-        return UserDTO.fromUser(user);
     }
 
     /**

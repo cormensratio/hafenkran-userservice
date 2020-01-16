@@ -87,16 +87,6 @@ public interface UserService extends UserDetailsService {
      * @param updateUserDTO the DTO that contains the new user info
      * @return the {@link UserDTO} of the updated user
      */
-    UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO);
-
-    /**
-     * Updates the status of the user with the {@code id}.
-     * If it was {@link User.Status}.INACTIVE the status will now be {@link User.Status}.ACTIVE.
-     * If it was {@link User.Status}.ACTIVE the status will now be {@link User.Status}.INACTIVE.
-     *
-     * @param id The user which status should be changed.
-     * @return The {@link UserDTO} of the user with the changed status.
-     */
-    UserDTO setUserStatus(@NonNull UUID id);
+    UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO, boolean changeStatus);
 
 }
