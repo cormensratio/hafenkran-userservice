@@ -26,15 +26,16 @@ public class InitDatabase implements CommandLineRunner {
     @Value("${mockdata:true}")
     private Boolean isLoadMockdata;
 
-    @Value("${service-user.name")
+    @Value("${service-user.name}")
     private String serviceUserName;
 
-    @Value("${service-user.password")
+    @Value("${service-user.password}")
     private String serviceUserPassword;
 
     @Override
     public void run(String... args) {
         User service = new User(serviceUserName, passwordEncoder.encode(serviceUserPassword), "", true);
+        service.setStatus(User.Status.ACTIVE);
         userService.registerNewUser(service);
 
         if (isLoadMockdata) {
