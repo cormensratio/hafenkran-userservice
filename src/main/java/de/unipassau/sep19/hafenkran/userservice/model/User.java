@@ -48,7 +48,7 @@ public class User {
     }
 
     public static User fromUserCreateDTO(@NonNull UserCreateDTO userDTO, @NonNull String encodedPassword) {
-        return new User(userDTO.getName(), encodedPassword, userDTO.getEmail(), userDTO.isAdmin());
+        return new User(userDTO.getName(), encodedPassword, userDTO.getEmail(), false);
     }
 
 }

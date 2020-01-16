@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -42,6 +43,7 @@ public class AuthController {
      * @return a {@link AuthResponseDTO} including the newly generated token
      */
     @PostMapping("/authenticate")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody @Valid AuthRequestDTO authenticationRequest) {
         authenticate(authenticationRequest.getName(), authenticationRequest.getPassword());
         UserDTO userDto = userService.getUserDTOFromUserName(authenticationRequest.getName());
@@ -66,6 +68,7 @@ public class AuthController {
      * @return a {@link AuthResponseDTO} including the newly generated token
      */
     @GetMapping("/refresh")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> refreshAuthToken() {
         final String token = jwtTokenUtil.generateRefreshToken();
         return ResponseEntity.ok(new AuthResponseDTO(token));

@@ -31,7 +31,4 @@ public class UserCreateDTO {
     @NonNull
     @JsonProperty("email")
     private final String email;
-
-    @JsonProperty("isAdmin")
-    private final boolean isAdmin;
 }
