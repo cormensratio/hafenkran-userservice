@@ -40,6 +40,7 @@ public class UserServiceImplTest {
     private UserService subject;
     private User testUser;
     private User testUser2;
+    private User testUser3;
     private User testAdmin;
 
     @Before
@@ -47,10 +48,16 @@ public class UserServiceImplTest {
         this.subject = new UserServiceImpl(userRepository, passwordEncoder);
         this.testUser = new User("testUser", "testPassword", "testMail", false);
         this.testUser2 = new User("testUser", "testPassword", "testMail", false);
+        this.testUser3 = new User("testUser", "testPassword", "testMail", false);
         this.testAdmin = new User("testAdmin", "testPassword", "testMail", true);
         this.testUser.setId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         this.testUser2.setId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
-        this.testAdmin.setId(UUID.fromString("00000000-0000-0000-0000-000000000003"));
+        this.testUser3.setId(UUID.fromString("00000000-0000-0000-0000-000000000003"));
+        this.testAdmin.setId(UUID.fromString("00000000-0000-0000-0000-000000000004"));
+        this.testUser.setStatus(User.Status.ACTIVE);
+        this.testUser2.setStatus(User.Status.ACTIVE);
+        this.testUser3.setStatus(User.Status.INACTIVE);
+        this.testAdmin.setStatus(User.Status.ACTIVE);
     }
 
     @Test
@@ -171,14 +178,15 @@ public class UserServiceImplTest {
                 testUser.getPassword(),
                 "newpassword",
                 "newmail",
+                User.Status.ACTIVE,
                 true
         );
 
         UserDTO userDTO = UserDTO.fromUser(testUser);
         SecurityContext mockContext = mock(SecurityContext.class);
         JwtAuthentication auth = new JwtAuthentication(userDTO);
-
         SecurityContextHolder.setContext(mockContext);
+
         when(mockContext.getAuthentication()).thenReturn(auth);
         when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
         when(userRepository.save(any(User.class))).thenReturn(testUser);
@@ -192,7 +200,7 @@ public class UserServiceImplTest {
         assertEquals(updatedUser.getId(), testUser.getId());
         assertEquals(updatedUser.getEmail(), newUserInfo.getEmail());
         assertFalse(updatedUser.isAdmin());
-        verify(mockContext, times(2)).getAuthentication();
+        verify(mockContext, times(1)).getAuthentication();
         verify(userRepository, times(1)).findById(testUser.getId());
         verify(userRepository, times(1)).save(any(User.class));
         verifyNoMoreInteractions(mockContext, userRepository);
@@ -200,7 +208,7 @@ public class UserServiceImplTest {
 
 
     @Test
-    public void testUpdateUser_nonExistingUser_exception() {
+    public void testUpdateUser_nonExistingUser_throwsException() {
         // Arrange
         expectedEx.expect(ResourceNotFoundException.class);
         UserUpdateDTO newUserInfo = new UserUpdateDTO(
@@ -208,6 +216,7 @@ public class UserServiceImplTest {
                 "password",
                 "newpassword",
                 "newmail",
+                User.Status.ACTIVE,
                 true
         );
 
@@ -231,7 +240,8 @@ public class UserServiceImplTest {
                 testUser2.getPassword(),
                 "newpassword",
                 "newmail",
-                true
+                User.Status.INACTIVE,
+                false
         );
         expectedEx.expect(ResponseStatusException.class);
 
@@ -247,7 +257,136 @@ public class UserServiceImplTest {
     }
 
     @Test
+    public void testUpdateUser_changedStatusAndAdminSetsStatus_statusSuccessfullyChanged() {
+
+        // Arrange
+        UserUpdateDTO newUserInfo = new UserUpdateDTO(
+                testUser3.getId(),
+                testUser3.getPassword(),
+                "testPassword",
+                "testMail",
+                User.Status.ACTIVE,
+                false
+        );
+        //testUser3.setId(testUser.getId());
+
+        UserDTO userDTO = UserDTO.fromUser(testAdmin);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+        when(userRepository.findById(testUser3.getId())).thenReturn(Optional.of(testUser3));
+        when(userRepository.save(testUser3)).thenReturn(testUser3);
+        when(passwordEncoder.encode(newUserInfo.getNewPassword())).thenReturn(newUserInfo.getNewPassword());
+
+        // Act
+        UserDTO actual = subject.updateUser(newUserInfo);
+
+        // Assert
+        assertEquals(actual.getStatus(), testUser3.getStatus());
+        assertTrue(userDTO.isAdmin());
+        verify(userRepository, times(1)).findById(testUser3.getId());
+        verify(userRepository, times(1)).save(testUser3);
+    }
+
+    @Test
+    public void testUpdateUser_changedAccountIsCurrentAccount_throwsException() {
+
+        // Arrange
+        expectedEx.expect(ResponseStatusException.class);
+        expectedEx.expectMessage("You aren't allowed to change your own status.");
+
+        UserUpdateDTO newUserInfo = new UserUpdateDTO(
+                testAdmin.getId(),
+                testAdmin.getPassword(),
+                "testPassword",
+                "testMail",
+                User.Status.INACTIVE,
+                true
+        );
+
+        UserDTO userDTO = UserDTO.fromUser(testAdmin);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+        when(userRepository.findById(testAdmin.getId())).thenReturn(Optional.of(testAdmin));
+
+        // Act
+        UserDTO actual = subject.updateUser(newUserInfo);
+
+        // Assert - with rule
+
+    }
+
+    @Test
+    public void testUpdateUser_changedStatusAndUserSetsStatus_throwsException() {
+
+        // Arrange
+        expectedEx.expect(ResponseStatusException.class);
+        expectedEx.expectMessage("Only admins are allowed to update other users!");
+
+        UserUpdateDTO newUserInfo = new UserUpdateDTO(
+                testUser3.getId(),
+                testUser3.getPassword(),
+                "testPassword",
+                "testMail",
+                User.Status.ACTIVE,
+                false
+        );
+
+        UserDTO userDTO = UserDTO.fromUser(testUser2);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+        when(userRepository.findById(testUser3.getId())).thenReturn(Optional.of(testUser3));
+
+        // Act
+        UserDTO actual = subject.updateUser(newUserInfo);
+
+        // Assert - with rule
+
+    }
+
+    @Test
+    public void testUpdateUser_userWantsToChangeDataAndIncorrectOldPassword_throwsException() {
+
+        // Arrange
+        expectedEx.expect(ResponseStatusException.class);
+        expectedEx.expectMessage("The given user password is not correct!");
+
+        UserUpdateDTO newUserInfo = new UserUpdateDTO(
+                testUser.getId(),
+                "password",
+                "newPassword",
+                "testMail",
+                User.Status.ACTIVE,
+                false
+        );
+
+        UserDTO userDTO = UserDTO.fromUser(testUser);
+        SecurityContext mockContext = mock(SecurityContext.class);
+        JwtAuthentication auth = new JwtAuthentication(userDTO);
+        SecurityContextHolder.setContext(mockContext);
+
+        when(mockContext.getAuthentication()).thenReturn(auth);
+        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        when(passwordEncoder.matches(eq(newUserInfo.getPassword()), any(String.class))).thenReturn(false);
+
+        // Act
+        UserDTO actual = subject.updateUser(newUserInfo);
+
+        // Assert - with rule
+
+    }
+    
+    @Test
     public void testDeleteUser_existingUserAndAdminIsTrue_userSuccessfullyDeleted() {
+        
         // Arrange
         UserDTO userDTO = UserDTO.fromUser(testAdmin);
         SecurityContext mockContext = mock(SecurityContext.class);
@@ -256,7 +395,7 @@ public class UserServiceImplTest {
 
         when(mockContext.getAuthentication()).thenReturn(auth);
         when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-
+        
         // Act
         UserDTO actual = subject.deleteUser(testUser.getId());
 
@@ -266,7 +405,6 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findById(testUser.getId());
         verify(userRepository, times(1)).deleteById(testUser.getId());
     }
-
 
     @Test
     public void testDeleteUser_nonExistingUserAndAdminIsTrue_throwsException() {
@@ -291,7 +429,7 @@ public class UserServiceImplTest {
         // Arrange
         expectedEx.expect(ResponseStatusException.class);
         expectedEx.expectMessage("Only admins are allowed to delete users.");
-
+        
         UserDTO userDTO = UserDTO.fromUser(testUser);
         SecurityContext mockContext = mock(SecurityContext.class);
         JwtAuthentication auth = new JwtAuthentication(userDTO);

@@ -2,8 +2,8 @@ package de.unipassau.sep19.hafenkran.userservice.service;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
-import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -82,10 +82,10 @@ public interface UserService extends UserDetailsService {
     UserDTO getUserDTOForCurrentUser();
 
     /**
-     * Updates the information of the current user
+     * Updates the information of the current user.
      *
-     * @param updateUserDTO the DTO that contains the new user info
-     * @return the {@link UserDTO} of the updated user
+     * @param updateUserDTO The DTO that contains the new user information.
+     * @return The {@link UserDTO} of the updated user.
      */
     UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO);
 

@@ -30,11 +30,15 @@ public class UserDTO {
     @JsonProperty("email")
     private final String email;
 
+    @NonNull
+    @JsonProperty("status")
+    private final User.Status status;
+
     @Getter(onMethod = @__(@JsonProperty("isAdmin")))
     private final boolean isAdmin;
 
     public static UserDTO fromUser(@NonNull User user) {
-        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.isAdmin());
+        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getStatus(), user.isAdmin());
     }
 
     public static List<UserDTO> convertUserListToDTOList(@NonNull List<User> userList) {

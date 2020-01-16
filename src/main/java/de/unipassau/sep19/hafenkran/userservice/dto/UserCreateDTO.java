@@ -18,7 +18,6 @@ public class UserCreateDTO {
 
     @NonNull
     @NotBlank
-    @Pattern(regexp = "[a-z0-9]([-a-z0-9]*[a-z0-9])?")
     @JsonProperty("name")
     private final String name;
 

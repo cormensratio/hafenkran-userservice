@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO registerNewUser(@NonNull @Valid UserCreateDTO userCreateDTO) {
         User user = registerNewUser(
                 User.fromUserCreateDTO(userCreateDTO, passwordEncoder.encode(userCreateDTO.getPassword())));
-        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.isAdmin());
+        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getStatus(), user.isAdmin());
     }
 
     /**
@@ -124,8 +124,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User registerNewUser(@NonNull User user) {
-        if(userRepository.findByName(user.getName()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "A user with the name " + user.getName() + " already exists");
+        if (userRepository.findByName(user.getName()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "A user with the name " + user.getName() + " already exists");
         }
         return userRepository.save(user);
     }
@@ -160,20 +161,31 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO) {
         UUID id = updateUserDTO.getId();
+        User.Status status = updateUserDTO.getStatus();
         User targetUser = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", id.toString()));
 
-        boolean currentUserIsAdmin = SecurityContextUtil.getCurrentUserDTO().isAdmin();
+        UserDTO currentUserDTO = SecurityContextUtil.getCurrentUserDTO();
+        boolean currentUserIsAdmin = currentUserDTO.isAdmin();
 
-        if (!id.equals(SecurityContextUtil.getCurrentUserDTO().getId()) && !currentUserIsAdmin) {
+        if (!id.equals(currentUserDTO.getId()) && !currentUserIsAdmin) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "Only admins are allowed update other users!");
+                    "Only admins are allowed to update other users!");
         }
 
         if (!currentUserIsAdmin) {
             if (!isPasswordMatching(targetUser.getPassword(), updateUserDTO.getPassword())) {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                         "The given user password is not correct!");
+            }
+        }
+
+        // Change status if the currentUser is an admin and to change the status was selected
+        if (status != targetUser.getStatus() && currentUserIsAdmin) {
+            if (targetUser.getId() == currentUserDTO.getId()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "You aren't allowed to change your own status.");
+            } else {
+                targetUser.setStatus(status);
             }
         }
 
@@ -198,7 +210,8 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Checks if two passwords, one encoded, the other in plain text are matching
-     * @param encodedPassword the encoded password
+     *
+     * @param encodedPassword   the encoded password
      * @param plaintextPassword the plain text password
      * @return if passwords are matching
      */
