@@ -176,10 +176,11 @@ public class UserServiceImpl implements UserService {
 
         // Change status if the currentUser is an admin and to change the status was selected
         if (status != targetUser.getStatus() && currentUserIsAdmin) {
-            targetUser.setStatus(status);
-        } else if (status != targetUser.getStatus()) { // Statuschange was selected, but it wasn't an admin
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "You are not allowed to change the status of the user.");
+            if (targetUser.getId() == currentUserDTO.getId()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "You aren't allowed to change your own status.");
+            } else {
+                targetUser.setStatus(status);
+            }
         }
 
         // set admin flag of updated user only if the user that updates it is an admin
