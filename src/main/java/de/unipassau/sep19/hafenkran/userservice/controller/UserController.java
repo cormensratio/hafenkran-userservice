@@ -37,6 +37,7 @@ public class UserController {
      */
     @GetMapping("/me")
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public UserDTO me() {
         return userService.getUserDTOForCurrentUser();
     }
@@ -90,6 +91,7 @@ public class UserController {
      */
     @PostMapping("/update")
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo) {
         return userService.updateUser(newUserInfo);
     }
@@ -102,6 +104,7 @@ public class UserController {
      */
     @PostMapping("/delete")
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public UserDTO deleteUser(@RequestParam(name = "id") UUID id) {
         return userService.deleteUser(id);
     }
