@@ -24,6 +24,16 @@
       "name": "jwt.refresh-validity",
       "type": "java.lang.String",
       "description": "The time in seconds for which a generated JWT refresh token is valid."
+    },
+    {
+      "name": "service-user.name",
+      "type": "java.lang.String",
+      "description": "The user name of the user used for internal communication between the microservices."
+    },
+    {
+      "name": "service-user.password",
+      "type": "java.lang.String",
+      "description": "The password of the user used for internal communication between the microservices."
     }
   ]
 }

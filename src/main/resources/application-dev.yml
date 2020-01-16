@@ -17,3 +17,7 @@ jwt:
   secret: MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB
 
 mockdata: true
+
+service-user:
+  name: service
+  password: test

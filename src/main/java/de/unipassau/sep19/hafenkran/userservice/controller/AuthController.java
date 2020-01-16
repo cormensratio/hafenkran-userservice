@@ -10,6 +10,7 @@ import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,6 +47,7 @@ public class AuthController {
      * @return a {@link AuthResponseDTO} including the newly generated token
      */
     @PostMapping("/authenticate")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody @Valid AuthRequestDTO authenticationRequest) {
         authenticate(authenticationRequest.getName(), authenticationRequest.getPassword());
         UserDTO userDto = userService.getUserDTOFromUserName(authenticationRequest.getName());
@@ -75,6 +77,7 @@ public class AuthController {
      * @return a {@link AuthResponseDTO} including the newly generated token
      */
     @GetMapping("/refresh")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> refreshAuthToken() {
 
         // Check if the useraccount has the permission to use the system

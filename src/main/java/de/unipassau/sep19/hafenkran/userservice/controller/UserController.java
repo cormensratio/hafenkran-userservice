@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -48,17 +47,12 @@ public class UserController {
      * @param userCreateDTO The DTO used to create the new {@link User}.
      * @return The newly created {@link User}.
      */
-    @PostMapping
+    @PostMapping("/create")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public UserDTO createNewUser(@NonNull @RequestBody
                                  @Valid UserCreateDTO userCreateDTO) {
-        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
-        if (currentUser.isAdmin()) {
-            return userService.registerNewUser(userCreateDTO);
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to create new users");
-        }
+        return userService.registerNewUser(userCreateDTO);
     }
 
     /**
@@ -102,10 +96,10 @@ public class UserController {
      * @param id The id of the user to be deleted.
      * @return A {@link UserDTO} of the user that was deleted.
      */
-    @PostMapping("/delete")
+    @PostMapping("/delete/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO deleteUser(@RequestParam(name = "id") UUID id) {
+    public UserDTO deleteUser(@PathVariable UUID id) {
         return userService.deleteUser(id);
     }
 }
