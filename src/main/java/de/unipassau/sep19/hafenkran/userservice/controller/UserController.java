@@ -102,7 +102,7 @@ public class UserController {
      * @param id The id of the user to be deleted.
      * @return A {@link UserDTO} of the user that was deleted.
      */
-    @PostMapping("/delete{id}")
+    @PostMapping("/delete/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public UserDTO deleteUser(@PathVariable UUID id) {
