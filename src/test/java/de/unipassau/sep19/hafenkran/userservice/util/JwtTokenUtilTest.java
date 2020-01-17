@@ -1,6 +1,7 @@
 package de.unipassau.sep19.hafenkran.userservice.util;
 
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
+import de.unipassau.sep19.hafenkran.userservice.model.User;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import org.junit.Before;
@@ -19,7 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class JwtTokenUtilTest {
 
     private static final UserDTO USER_DTO = new UserDTO(UUID.fromString("00000000-0000-0000-0000-000000000001"), "Rick",
-            "", false);
+            "", User.Status.ACTIVE, false);
+
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
     private String jwt;
@@ -27,8 +29,8 @@ public class JwtTokenUtilTest {
 
     @Before
     public void setUp() {
-        this.subject = new JwtTokenUtil(18000L, "MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB");
-        this.jwt = subject.generateToken(USER_DTO);
+        this.subject = new JwtTokenUtil(18000L, 18000L, "MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB");
+        this.jwt = subject.generateAuthToken(USER_DTO);
     }
 
     @Test
@@ -91,8 +93,9 @@ public class JwtTokenUtilTest {
         // Arrange
         expectedEx.expect(ExpiredJwtException.class);
 
-        JwtTokenUtil subject = new JwtTokenUtil(-1000L, "MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB");
-        jwt = subject.generateToken(USER_DTO);
+        JwtTokenUtil subject = new JwtTokenUtil(-1000L, -1000L,
+                "MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB");
+        jwt = subject.generateAuthToken(USER_DTO);
 
         // Act
         boolean actual = subject.validateToken(jwt);

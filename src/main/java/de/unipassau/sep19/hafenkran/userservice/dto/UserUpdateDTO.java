@@ -2,32 +2,39 @@ package de.unipassau.sep19.hafenkran.userservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import java.util.UUID;
 
 @Data
 @RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
-public class UserCreateDTO {
+public class UserUpdateDTO {
+
+    @NonNull
+    @JsonProperty("id")
+    private final UUID id;
 
     @NonNull
     @NotBlank
-    @JsonProperty("name")
-    private final String name;
-
-    @NonNull
-    @NotBlank
-    @Size(min = 8)
     @JsonProperty("password")
     private final String password;
 
     @NonNull
+    @JsonProperty("newPassword")
+    private final String newPassword;
+
+    @NonNull
     @JsonProperty("email")
     private final String email;
+
+    @NonNull
+    @JsonProperty("status")
+    private final User.Status status;
+
+    @JsonProperty("isAdmin")
+    private final boolean isAdmin;
 }

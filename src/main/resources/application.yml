@@ -22,3 +22,7 @@ jwt:
   secret:
 
 mockdata: false
+
+service-user:
+  name: service
+  password: test

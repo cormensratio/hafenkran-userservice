@@ -9,7 +9,6 @@ import lombok.NonNull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
@@ -36,6 +35,10 @@ public class User {
     @Column
     private String email;
 
+    @NonNull
+    @Column
+    private Status status;
+
     @Column(nullable = false)
     private boolean isAdmin;
 
@@ -43,12 +46,23 @@ public class User {
         this.name = name;
         this.password = encodedPassword;
         this.email = email;
+        this.status = Status.INACTIVE;
         this.isAdmin = isAdmin;
         this.id = UUID.randomUUID();
     }
 
-    public static User fromUserCreateDTO(@NonNull UserCreateDTO userDTO) {
-        return new User(userDTO.getName(), userDTO.getPassword(), userDTO.getEmail(), userDTO.isAdmin());
+    public static User fromUserCreateDTO(@NonNull UserCreateDTO userDTO, @NonNull String encodedPassword) {
+        return new User(userDTO.getName(), encodedPassword, userDTO.getEmail(), false);
+    }
+
+    /**
+     * The status of the user accounts which the admin can set.
+     * <p>
+     * {@code ACTIVE} means that the user account is currently available cause the admin approved it.
+     * {@code INACTIVE} means that the user account is currently unavailable cause the admin didn't approve it.
+     */
+    public enum Status {
+        ACTIVE, INACTIVE
     }
 
 }

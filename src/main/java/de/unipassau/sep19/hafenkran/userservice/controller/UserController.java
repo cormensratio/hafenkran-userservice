@@ -3,6 +3,7 @@ package de.unipassau.sep19.hafenkran.userservice.controller;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -36,6 +36,7 @@ public class UserController {
      */
     @GetMapping("/me")
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public UserDTO me() {
         return userService.getUserDTOForCurrentUser();
     }
@@ -49,14 +50,9 @@ public class UserController {
     @PostMapping("/create")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public User createNewUser(@NonNull @RequestBody
-                              @Valid UserCreateDTO userCreateDTO) {
-        UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
-        if (currentUser.isAdmin()) {
-            return userService.registerNewUser(userCreateDTO);
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to create new users");
-        }
+    public UserDTO createNewUser(@NonNull @RequestBody
+                                 @Valid UserCreateDTO userCreateDTO) {
+        return userService.registerNewUser(userCreateDTO);
     }
 
     /**
@@ -80,4 +76,30 @@ public class UserController {
         }
     }
 
+    /**
+     * Updates the given user.
+     * The params, that can be updated, are the password, the email, the status and the adminFlag.
+     *
+     * @param newUserInfo the DTO that holds the new user informations.
+     * @return A {@link UserDTO} containing the details of the updated user.
+     */
+    @PostMapping("/update")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo) {
+        return userService.updateUser(newUserInfo);
+    }
+
+    /**
+     * POST-Endpoint to delete one user. This endpoint is only available for admins.
+     *
+     * @param id The id of the user to be deleted.
+     * @return A {@link UserDTO} of the user that was deleted.
+     */
+    @PostMapping("/delete/{id}")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public UserDTO deleteUser(@PathVariable UUID id) {
+        return userService.deleteUser(id);
+    }
 }

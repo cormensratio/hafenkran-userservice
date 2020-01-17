@@ -12,7 +12,12 @@ spring:
       ddl-auto: create-drop
 
 jwt:
-  validity: 18000
+  auth-validity: 172800
+  refresh-validity: 300
   secret: MCgCIQCAS7IFlSvaBOPXwSBHo+7+6C4RbkvYj3fgI5+Abe4pRwIDAQAB
 
 mockdata: true
+
+service-user:
+  name: service
+  password: test

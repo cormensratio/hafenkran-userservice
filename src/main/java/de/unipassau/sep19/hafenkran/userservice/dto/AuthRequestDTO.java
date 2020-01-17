@@ -2,6 +2,7 @@ package de.unipassau.sep19.hafenkran.userservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,4 +23,5 @@ public class AuthRequestDTO implements Serializable {
     @NotBlank
     @JsonProperty("password")
     private final String password;
+
 }

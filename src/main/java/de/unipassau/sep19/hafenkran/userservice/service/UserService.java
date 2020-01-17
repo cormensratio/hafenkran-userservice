@@ -3,6 +3,7 @@ package de.unipassau.sep19.hafenkran.userservice.service;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
+import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import lombok.NonNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -42,12 +43,20 @@ public interface UserService extends UserDetailsService {
     UserDTO getUserDTOFromUserId(@NonNull UUID userId);
 
     /**
+     * Deletes the user with the {@code id}.
+     *
+     * @param id The id of the user to be deleted.
+     * @return A {@link UserDTO} of the deleted user.
+     */
+    UserDTO deleteUser(@NonNull UUID id);
+
+    /**
      * Creates and saves a new user.
      *
      * @param userCreateDTO the DTO used for creating the user.
      * @return the new {@link User} returned after saving to the database.
      */
-    User registerNewUser(@NonNull UserCreateDTO userCreateDTO);
+    UserDTO registerNewUser(@NonNull UserCreateDTO userCreateDTO);
 
     /**
      * Creates and saves a new user.
@@ -71,5 +80,13 @@ public interface UserService extends UserDetailsService {
      * @return the {@link UserDTO} representation of the currently active user.
      */
     UserDTO getUserDTOForCurrentUser();
+
+    /**
+     * Updates the information of the current user.
+     *
+     * @param updateUserDTO The DTO that contains the new user information.
+     * @return The {@link UserDTO} of the updated user.
+     */
+    UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO);
 
 }
