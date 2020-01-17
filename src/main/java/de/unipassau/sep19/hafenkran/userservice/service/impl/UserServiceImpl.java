@@ -7,6 +7,7 @@ import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundException;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
+import de.unipassau.sep19.hafenkran.userservice.model.User.Status;
 import de.unipassau.sep19.hafenkran.userservice.repository.UserRepository;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
@@ -25,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -65,14 +67,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTOMinimal> retrieveUserInformation(List<UUID> ids) {
         return UserDTOMinimal.convertMinimalUserListToDTOList(findUserList(ids));
-    }
-
-    private List<User> findUserList(List<UUID> ids) {
-        if (ids.isEmpty()) {
-            return (List<User>) userRepository.findAll();
-        } else {
-            return userRepository.findByIdIn(ids);
-        }
     }
 
     /**
@@ -161,55 +155,68 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO) {
         UUID id = updateUserDTO.getId();
-        User.Status status = updateUserDTO.getStatus();
+        Optional<Status> status = updateUserDTO.getStatus();
         User targetUser = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", id.toString()));
 
         UserDTO currentUserDTO = SecurityContextUtil.getCurrentUserDTO();
         boolean currentUserIsAdmin = currentUserDTO.isAdmin();
 
-        if (!id.equals(currentUserDTO.getId()) && !currentUserIsAdmin) {
+        if (!currentUserIsAdmin && !id.equals(currentUserDTO.getId())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                     "Only admins are allowed to update other users!");
         }
 
-        if (!currentUserIsAdmin) {
-            if (!isPasswordMatching(targetUser.getPassword(), updateUserDTO.getPassword())) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                        "The given user password is not correct!");
-            }
-        }
-
         // Change status if the currentUser is an admin and to change the status was selected
-        if (status != targetUser.getStatus() && currentUserIsAdmin) {
+        if (currentUserIsAdmin
+                && status.isPresent()) {
             if (targetUser.getId() == currentUserDTO.getId()) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "You aren't allowed to change your own status.");
             } else {
-                targetUser.setStatus(status);
+                targetUser.setStatus(status.get());
             }
         }
 
         // set admin flag of updated user only if the user that updates it is an admin
-        boolean isAdmin = targetUser.isAdmin();
         if (currentUserIsAdmin) {
-            isAdmin = updateUserDTO.isAdmin();
+            if (updateUserDTO.getIsAdmin().isPresent()) {
+                targetUser.setAdmin(updateUserDTO.getIsAdmin().get());
+            }
         }
 
-        String password = targetUser.getPassword();
-        if (!updateUserDTO.getNewPassword().equals("")) {
-            password = passwordEncoder.encode(updateUserDTO.getNewPassword());
+        if (updateUserDTO.getNewPassword().isPresent() && !updateUserDTO.getNewPassword().get().isEmpty()) {
+            if (currentUserIsAdmin) {
+                targetUser.setPassword(passwordEncoder.encode(updateUserDTO.getNewPassword().get()));
+            } else if (updateUserDTO.getPassword().isPresent()) {
+                if (!isPasswordMatching(targetUser.getPassword(),
+                        updateUserDTO.getPassword().get())) {
+                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                            "The given user password is not correct!");
+                }
+
+                targetUser.setPassword(passwordEncoder.encode(updateUserDTO.getNewPassword().get()));
+            }
         }
 
-        targetUser.setPassword(password);
-        targetUser.setEmail(updateUserDTO.getEmail());
-        targetUser.setAdmin(isAdmin);
+        if (updateUserDTO.getEmail().isPresent()) {
+            targetUser.setEmail(updateUserDTO.getEmail().get());
+        }
 
         userRepository.save(targetUser);
         return UserDTO.fromUser(targetUser);
     }
 
+    private List<User> findUserList(List<UUID> ids) {
+        if (ids.isEmpty()) {
+            return (List<User>) userRepository.findAll();
+        } else {
+            return userRepository.findByIdIn(ids);
+        }
+    }
+
     /**
-     * Checks if two passwords, one encoded, the other in plain text are matching
+     * Checks if two passwords, one encoded, the other in plain text are
+     * matching
      *
      * @param encodedPassword   the encoded password
      * @param plaintextPassword the plain text password
