@@ -10,7 +10,6 @@ import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
 /**
  * A {@link RestController} for requesting a JWT for a user session.
@@ -66,8 +64,10 @@ public class AuthController {
 
         // Check if the useraccount has the permission to use the system
         UserDTO userDTO = userService.getUserDTOFromUserName(username);
-        if (userDTO.getStatus() != User.Status.ACTIVE) {
+        if (userDTO.getStatus() == User.Status.INACTIVE) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You have no permission from an admin to use the system.");
+        } else if (userDTO.getStatus() == User.Status.DELETED) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "There exists no such account in our system.");
         }
     }
 

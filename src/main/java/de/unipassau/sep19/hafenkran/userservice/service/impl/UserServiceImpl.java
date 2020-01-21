@@ -97,9 +97,9 @@ public class UserServiceImpl implements UserService {
 
             // Only delete the account if it isn't the account from the current user
             if (currentUser.getId() != id) {
-                UserDTO deletedUserDTO = UserDTO.fromUser(deletedUser);
-                userRepository.deleteById(id);
-                return deletedUserDTO;
+                deletedUser.setStatus(User.Status.DELETED);
+                userRepository.save(deletedUser);
+                return UserDTO.fromUser(deletedUser);
             } else {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "You are not allowed to delete your own account. Please contact another admin to do so.");
