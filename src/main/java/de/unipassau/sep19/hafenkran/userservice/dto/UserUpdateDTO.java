@@ -21,7 +21,6 @@ public class UserUpdateDTO {
     private final UUID id;
 
     @NonNull
-    @NotBlank
     @JsonProperty("password")
     private final Optional<String> password;
 

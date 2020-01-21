@@ -45,7 +45,7 @@ public class InitDatabase implements CommandLineRunner {
             userService.registerNewUser(admin);
             User user = new User("Rick", passwordEncoder.encode("test"), "", false);
             user.setId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
-            admin.setStatus(User.Status.ACTIVE);
+            user.setStatus(User.Status.ACTIVE);
             userService.registerNewUser(user);
         }
     }
