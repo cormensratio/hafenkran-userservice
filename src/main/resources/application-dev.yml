@@ -21,3 +21,5 @@ mockdata: true
 service-user:
   name: service
   password: test
+
+cluster-service-uri: http://localhost:8082
