@@ -36,9 +36,9 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__({@Autowired, @Lazy}))
 public class UserServiceImpl implements UserService {
 
+    private static final int MIN_PASSWORD_LENGTH = 8;
     @NonNull
     private final UserRepository userRepository;
-
     @NonNull
     private final PasswordEncoder passwordEncoder;
 
@@ -154,17 +154,36 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO) {
-        UUID id = updateUserDTO.getId();
-        Optional<Status> status = updateUserDTO.getStatus();
-        User targetUser = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(User.class, "id", id.toString()));
-
         UserDTO currentUserDTO = SecurityContextUtil.getCurrentUserDTO();
         boolean currentUserIsAdmin = currentUserDTO.isAdmin();
+        UUID targetUserId = updateUserDTO.getId();
+        UUID currentUserId = currentUserDTO.getId();
+        Optional<Status> status = updateUserDTO.getStatus();
 
-        if (!currentUserIsAdmin && !id.equals(currentUserDTO.getId())) {
+        User targetUser = userRepository.findById(targetUserId).orElseThrow(
+                () -> new ResourceNotFoundException(User.class, "id", targetUserId.toString()));
+
+        User currentUser = userRepository.findById(currentUserId).orElseThrow(
+                () -> new ResourceNotFoundException(User.class, "id",
+                        currentUserId.toString()));
+
+        if (!currentUserIsAdmin && !targetUserId.equals(currentUserDTO.getId())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                     "Only admins are allowed to update other users!");
+        }
+
+        // Throw exception if the user tries to change the settings without
+        // providing the old password.
+        if (!currentUserIsAdmin && !updateUserDTO.getPassword().isPresent()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You have to provide your password in order to " +
+                            "modify your user settings!");
+        }
+
+        // Throw exception if the given user password is incorrect
+        if (!currentUserIsAdmin && !isPasswordMatching(currentUser.getPassword(), updateUserDTO.getPassword().get())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "The given user password is not correct!");
         }
 
         // Change status if the currentUser is an admin and to change the status was selected
@@ -177,7 +196,8 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // set admin flag of updated user only if the user that updates it is an admin
+        // Set admin flag of updated user only if the user that updates it is
+        // an admin
         if (currentUserIsAdmin) {
             if (updateUserDTO.getIsAdmin().isPresent()) {
                 targetUser.setAdmin(updateUserDTO.getIsAdmin().get());
@@ -194,6 +214,7 @@ public class UserServiceImpl implements UserService {
                             "The given user password is not correct!");
                 }
 
+                hasCorrectPasswordLength(updateUserDTO.getNewPassword().get());
                 targetUser.setPassword(passwordEncoder.encode(updateUserDTO.getNewPassword().get()));
             }
         }
@@ -224,5 +245,13 @@ public class UserServiceImpl implements UserService {
      */
     private boolean isPasswordMatching(@NonNull String encodedPassword, @NonNull String plaintextPassword) {
         return passwordEncoder.matches(plaintextPassword, encodedPassword);
+    }
+
+    private void hasCorrectPasswordLength(@NonNull String password) {
+        if (password.length() < MIN_PASSWORD_LENGTH) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "The given password was not long enough! Expected " +
+                            "minimum length of: " + MIN_PASSWORD_LENGTH);
+        }
     }
 }
