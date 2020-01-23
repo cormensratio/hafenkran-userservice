@@ -14,6 +14,7 @@ import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -36,11 +37,12 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor = @__({@Autowired, @Lazy}))
 public class UserServiceImpl implements UserService {
 
-    private static final int MIN_PASSWORD_LENGTH = 8;
     @NonNull
     private final UserRepository userRepository;
     @NonNull
     private final PasswordEncoder passwordEncoder;
+    @Value("${password.length.min}")
+    private int MIN_PASSWORD_LENGTH;
 
     /**
      * {@inheritDoc}
@@ -221,6 +223,11 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+        if (!currentUserIsAdmin && updateUserDTO.getIsAdmin().isPresent()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You " +
+                    "are no admin and not allowed to change the admin status!");
+        }
+
         if (updateUserDTO.getNewPassword().isPresent() && !updateUserDTO.getNewPassword().get().isEmpty()) {
             if (currentUserIsAdmin) {
                 targetUser.setPassword(passwordEncoder.encode(updateUserDTO.getNewPassword().get()));
@@ -236,7 +243,8 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        if (updateUserDTO.getEmail().isPresent()) {
+        if (updateUserDTO.getEmail().isPresent()
+                && !updateUserDTO.getEmail().get().isEmpty()) {
             targetUser.setEmail(updateUserDTO.getEmail().get());
         }
 
