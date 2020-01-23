@@ -169,7 +169,7 @@ public class UserServiceImpl implements UserService {
 
         if (!currentUserIsAdmin && !targetUserId.equals(currentUserDTO.getId())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "Only admins are allowed to update other users!");
+                    "You are not allowed to update users!");
         }
 
         // Throw exception if the user tries to change the settings without
@@ -183,7 +183,24 @@ public class UserServiceImpl implements UserService {
         // Throw exception if the given user password is incorrect
         if (!currentUserIsAdmin && !isPasswordMatching(currentUser.getPassword(), updateUserDTO.getPassword().get())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "The given user password is not correct!");
+                    "The given password is not correct!");
+        }
+
+        // Throw exception if the user is an admin and does not provide a
+        // password to modify another admin
+        if (currentUserIsAdmin && targetUser.isAdmin()
+                && !updateUserDTO.getPassword().isPresent()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You have to provide your password in order to " +
+                            "modify your user settings!");
+        }
+
+        // Throw exception if the user is an admin and provides a wrong
+        // password to modify another admin
+        if (currentUserIsAdmin && targetUser.isAdmin()
+                && !isPasswordMatching(currentUser.getPassword(), updateUserDTO.getPassword().get())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "The given password is not correct!");
         }
 
         // Change status if the currentUser is an admin and to change the status was selected
@@ -211,7 +228,7 @@ public class UserServiceImpl implements UserService {
                 if (!isPasswordMatching(targetUser.getPassword(),
                         updateUserDTO.getPassword().get())) {
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                            "The given user password is not correct!");
+                            "The given password is not correct!");
                 }
 
                 hasCorrectPasswordLength(updateUserDTO.getNewPassword().get());
