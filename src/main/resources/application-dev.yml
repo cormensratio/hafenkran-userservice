@@ -22,7 +22,4 @@ service-user:
   name: service
   password: test
 
-password:
-  length:
-    min: 8
-    max:
+password-length-min: 8

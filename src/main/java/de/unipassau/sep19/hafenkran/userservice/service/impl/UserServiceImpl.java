@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     @NonNull
     private final PasswordEncoder passwordEncoder;
-    @Value("${password.length.min}")
+    @Value("${password-length-min}")
     private int MIN_PASSWORD_LENGTH;
 
     /**
