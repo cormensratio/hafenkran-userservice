@@ -163,6 +163,11 @@ public class UserServiceImpl implements UserService {
         final UUID currentUserId = currentUserDTO.getId();
         final Optional<Status> status = updateUserDTO.getStatus();
 
+        if (!currentUserIsAdmin && !targetUserId.equals(currentUserDTO.getId())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You are not allowed to update users!");
+        }
+
         User targetUser = userRepository.findById(targetUserId).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", targetUserId.toString()));
 
@@ -170,10 +175,6 @@ public class UserServiceImpl implements UserService {
                 () -> new ResourceNotFoundException(User.class, "id",
                         currentUserId.toString()));
 
-        if (!currentUserIsAdmin && !targetUserId.equals(currentUserDTO.getId())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "You are not allowed to update users!");
-        }
 
         // Throw exception if the user tries to change the settings without
         // providing the old password.
