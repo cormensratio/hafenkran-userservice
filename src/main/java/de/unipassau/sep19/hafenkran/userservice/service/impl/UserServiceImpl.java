@@ -217,10 +217,8 @@ public class UserServiceImpl implements UserService {
 
         // Set admin flag of updated user only if the user that updates it is
         // an admin
-        if (currentUserIsAdmin) {
-            if (updateUserDTO.getIsAdmin().isPresent()) {
-                targetUser.setAdmin(updateUserDTO.getIsAdmin().get());
-            }
+        if (currentUserIsAdmin && updateUserDTO.getIsAdmin().isPresent()) {
+            targetUser.setAdmin(updateUserDTO.getIsAdmin().get());
         }
 
         if (!currentUserIsAdmin && updateUserDTO.getIsAdmin().isPresent()) {
