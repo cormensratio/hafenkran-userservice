@@ -175,7 +175,6 @@ public class UserServiceImpl implements UserService {
                 () -> new ResourceNotFoundException(User.class, "id",
                         currentUserId.toString()));
 
-
         // Throw exception if the user tries to change the settings without
         // providing the old password.
         if (!currentUserIsAdmin && !updateUserDTO.getPassword().isPresent()) {
@@ -219,13 +218,12 @@ public class UserServiceImpl implements UserService {
 
         // Set admin flag of updated user only if the user that updates it is
         // an admin
-        if (currentUserIsAdmin && updateUserDTO.getIsAdmin().isPresent()) {
-            targetUser.setAdmin(updateUserDTO.getIsAdmin().get());
-        }
-
         if (!currentUserIsAdmin && updateUserDTO.getIsAdmin().isPresent()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You " +
-                    "are no admin and not allowed to change the admin status!");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You are no admin and not allowed to change the admin status!");
+        } else if (currentUserIsAdmin && updateUserDTO.getIsAdmin().isPresent()) {
+            targetUser.setAdmin(updateUserDTO.getIsAdmin().get());
+
         }
 
         if (updateUserDTO.getNewPassword().isPresent() && !updateUserDTO.getNewPassword().get().isEmpty()) {
