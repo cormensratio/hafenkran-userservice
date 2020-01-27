@@ -155,12 +155,13 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO) {
-        UserDTO currentUserDTO = SecurityContextUtil.getCurrentUserDTO();
-        boolean currentUserIsAdmin = currentUserDTO.isAdmin();
-        UUID targetUserId = updateUserDTO.getId();
-        UUID currentUserId = currentUserDTO.getId();
-        Optional<Status> status = updateUserDTO.getStatus();
+    public UserDTO updateUser(@NonNull UUID userId,
+                              @NonNull UserUpdateDTO updateUserDTO) {
+        final UserDTO currentUserDTO = SecurityContextUtil.getCurrentUserDTO();
+        final boolean currentUserIsAdmin = currentUserDTO.isAdmin();
+        final UUID targetUserId = userId;
+        final UUID currentUserId = currentUserDTO.getId();
+        final Optional<Status> status = updateUserDTO.getStatus();
 
         User targetUser = userRepository.findById(targetUserId).orElseThrow(
                 () -> new ResourceNotFoundException(User.class, "id", targetUserId.toString()));

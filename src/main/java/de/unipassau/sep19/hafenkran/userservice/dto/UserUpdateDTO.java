@@ -17,10 +17,6 @@ import java.util.UUID;
 public class UserUpdateDTO {
 
     @NonNull
-    @JsonProperty("id")
-    private final UUID id;
-
-    @NonNull
     @JsonProperty("password")
     private final Optional<String> password;
 

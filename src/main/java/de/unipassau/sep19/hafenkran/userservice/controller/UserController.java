@@ -80,14 +80,15 @@ public class UserController {
      * Updates the given user.
      * The params, that can be updated, are the password, the email, the status and the adminFlag.
      *
-     * @param newUserInfo the DTO that holds the new user informations.
+     * @param newUserInfo the DTO that holds the new user information.
      * @return A {@link UserDTO} containing the details of the updated user.
      */
-    @PostMapping("/update")
+    @PostMapping("/update/{userId}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo) {
-        return userService.updateUser(newUserInfo);
+    public UserDTO updateUser(@NonNull @PathVariable UUID userId,
+                              @Valid @RequestBody UserUpdateDTO newUserInfo) {
+        return userService.updateUser(userId, newUserInfo);
     }
 
     /**
