@@ -9,6 +9,6 @@ import java.util.UUID;
  */
 public interface ClusterServiceClient {
 
-    void pushesDeletedOwnerIdAndTheChosenDeletionToClusterService(@NonNull UUID ownerId, @NonNull boolean deleteEverything);
+    void deleteExperimentsAndExecutionsFromUser(@NonNull UUID ownerId);
 
 }

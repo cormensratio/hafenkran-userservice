@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserDTO deleteUser(@NonNull UUID id, @NonNull boolean deleteEverything, boolean fulldeleteUser) {
+    public UserDTO deleteUser(@NonNull UUID id) {
         UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
         if (currentUser.isAdmin()) {
             User deletedUser = userRepository.findById(id).orElseThrow(
@@ -102,17 +102,10 @@ public class UserServiceImpl implements UserService {
             // Only delete the account if it isn't the account from the current user
             if (currentUser.getId() != id) {
 
-                if(deleteEverything || fulldeleteUser) {
-                    userRepository.deleteById(id);
-                } else {
-                    deletedUser.setStatus(User.Status.DELETED);
-                    userRepository.save(deletedUser);
-                }
+                deletedUser.setStatus(User.Status.DELETED);
+                userRepository.save(deletedUser);
 
-                if(!fulldeleteUser) {
-                    // Deletes everything from the chosen user, if there aren't any shared experiments, and, if there are, denies the access
-                    clusterServiceClient.pushesDeletedOwnerIdAndTheChosenDeletionToClusterService(id, deleteEverything);
-                }
+                clusterServiceClient.deleteExperimentsAndExecutionsFromUser(id);
 
                 return UserDTO.fromUser(deletedUser);
             } else {
