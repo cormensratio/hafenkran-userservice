@@ -44,11 +44,11 @@ public class ServiceClientImpl implements ServiceClient {
     /**
      * {@inheritDoc}
      */
-    public String post(@NonNull String path, @NonNull Object body, @Nullable Object body2, @Nullable HttpHeaders headers) {
-        return post(path, body, body2, headers, false);
+    public String post(@NonNull String path, @NonNull Object body, @Nullable HttpHeaders headers) {
+        return post(path, body, headers, false);
     }
 
-    private String post(@NonNull String path, @NonNull Object body, @Nullable Object body2, @Nullable HttpHeaders headers, boolean withoutAuthHeaders) {
+    private String post(@NonNull String path, @NonNull Object body, @Nullable HttpHeaders headers, boolean withoutAuthHeaders) {
         RestTemplate rt = new RestTemplate();
 
         headers = headers != null ? headers : new HttpHeaders();
@@ -76,8 +76,7 @@ public class ServiceClientImpl implements ServiceClient {
     }
 
     private String retrieveAuthHeaders() {
-        String loginResponse = post(usPath + "/authenticate", new AuthenticationDTO(serviceUserName, serviceUserPw),
-                null, null, true);
+        String loginResponse = post(usPath + "/authenticate", new AuthenticationDTO(serviceUserName, serviceUserPw), null, true);
 
         final String jwt;
         try {

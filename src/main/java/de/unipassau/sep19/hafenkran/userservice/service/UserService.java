@@ -51,7 +51,7 @@ public interface UserService extends UserDetailsService {
      * @param deleteEverything The chosen deletion method.
      * @return A {@link UserDTO} of the deleted user.
      */
-    UserDTO deleteUser(@NonNull UUID id, @NonNull boolean deleteEverything);
+    UserDTO deleteUser(@NonNull UUID id, @NonNull boolean deleteEverything, boolean fulldeleteUser);
 
     /**
      * Creates and saves a new user.

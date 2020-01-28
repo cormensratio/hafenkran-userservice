@@ -26,7 +26,7 @@ public class ClusterServiceClientImpl implements ClusterServiceClient {
      * {@inheritDoc}
      */
     public void pushesDeletedOwnerIdAndTheChosenDeletionToClusterService(@NonNull UUID ownerId, boolean deleteEverything) {
-        serviceClient.post(basePath + "/experiments/{ownerId}/delete", ownerId, deleteEverything, null);
+        serviceClient.post(basePath + "/experiments/{ownerId}/deletedUser?=" + deleteEverything, deleteEverything, null);
     }
 
 }
