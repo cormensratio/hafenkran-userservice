@@ -13,8 +13,9 @@ public interface ServiceClient {
      *
      * @param path    the target path.
      * @param body    the request body.
+     * @param body2   the 2nd request body.
      * @param headers optional headers sent with the request.
      * @return the response of the request.
      */
-    String post(@NonNull String path, @NonNull Object body, @Nullable HttpHeaders headers);
+    String post(@NonNull String path, @NonNull Object body, @Nullable Object body2, @Nullable HttpHeaders headers);
 }

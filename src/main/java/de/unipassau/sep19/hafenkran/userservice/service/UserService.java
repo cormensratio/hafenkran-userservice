@@ -43,12 +43,15 @@ public interface UserService extends UserDetailsService {
     UserDTO getUserDTOFromUserId(@NonNull UUID userId);
 
     /**
-     * Deletes the user with the {@code id}.
+     * Deletes the user with the {@code id} and all his executions and - if he has no shared experiments -
+     * all of the experiments as well. If {@code deleteEverything} is true, then everything will be deleted whether
+     * or not it is shared.
      *
      * @param id The id of the user to be deleted.
+     * @param deleteEverything The chosen deletion method.
      * @return A {@link UserDTO} of the deleted user.
      */
-    UserDTO deleteUser(@NonNull UUID id);
+    UserDTO deleteUser(@NonNull UUID id, @NonNull boolean deleteEverything);
 
     /**
      * Creates and saves a new user.

@@ -9,6 +9,7 @@ import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundExcept
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.repository.UserRepository;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
+import de.unipassau.sep19.hafenkran.userservice.serviceclient.ClusterServiceClient;
 import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,9 @@ public class UserServiceImpl implements UserService {
 
     @NonNull
     private final PasswordEncoder passwordEncoder;
+
+    @NonNull
+    private final ClusterServiceClient clusterServiceClient;
 
     /**
      * {@inheritDoc}
@@ -89,7 +93,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserDTO deleteUser(@NonNull UUID id) {
+    public UserDTO deleteUser(@NonNull UUID id, @NonNull boolean deleteEverything) {
         UserDTO currentUser = SecurityContextUtil.getCurrentUserDTO();
         if (currentUser.isAdmin()) {
             User deletedUser = userRepository.findById(id).orElseThrow(
@@ -99,6 +103,10 @@ public class UserServiceImpl implements UserService {
             if (currentUser.getId() != id) {
                 UserDTO deletedUserDTO = UserDTO.fromUser(deletedUser);
                 userRepository.deleteById(id);
+
+                // Deletes everything from the chosen user, if there aren't any shared experiments, and, if there are, denies the access
+                clusterServiceClient.pushesDeletedOwnerIdAndTheChosenDeletionToClusterService(id, deleteEverything);
+
                 return deletedUserDTO;
             } else {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,

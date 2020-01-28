@@ -92,14 +92,16 @@ public class UserController {
 
     /**
      * POST-Endpoint to delete one user. This endpoint is only available for admins.
+     * If {@code deleteEverything} is set true, everything from the user will be deleted, also if it is shared.
      *
      * @param id The id of the user to be deleted.
+     * @param deleteEverything The chosen deletion method.
      * @return A {@link UserDTO} of the user that was deleted.
      */
     @PostMapping("/delete/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO deleteUser(@PathVariable UUID id) {
-        return userService.deleteUser(id);
+    public UserDTO deleteUser(@PathVariable UUID id, @RequestParam (defaultValue = "false") boolean deleteEverything) {
+        return userService.deleteUser(id, deleteEverything);
     }
 }
