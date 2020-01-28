@@ -1,7 +1,19 @@
-/*package de.unipassau.sep19.hafenkran.userservice.service.impl;
+package de.unipassau.sep19.hafenkran.userservice.service.impl;
 
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+/*
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
@@ -439,4 +451,8 @@ public class UserServiceImplTest {
         // Assert - with rule
 
     }
-}*/
+}
+
+ */
+
+

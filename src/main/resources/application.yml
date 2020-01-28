@@ -26,3 +26,5 @@ mockdata: false
 service-user:
   name: service
   password: test
+
+password-length-min: 8
