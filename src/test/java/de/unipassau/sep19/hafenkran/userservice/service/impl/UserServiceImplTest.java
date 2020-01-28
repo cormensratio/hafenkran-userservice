@@ -1,37 +1,12 @@
 package de.unipassau.sep19.hafenkran.userservice.service.impl;
 
-import de.unipassau.sep19.hafenkran.userservice.config.JwtAuthentication;
-import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
-import de.unipassau.sep19.hafenkran.userservice.dto.UserDTO;
-import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
-import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundException;
-import de.unipassau.sep19.hafenkran.userservice.model.User;
-import de.unipassau.sep19.hafenkran.userservice.repository.UserRepository;
-import de.unipassau.sep19.hafenkran.userservice.service.UserService;
-import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
 
-    @Rule
+    /*@Rule
     public ExpectedException expectedEx = ExpectedException.none();
     @Mock
     private UserRepository userRepository;
@@ -463,5 +438,5 @@ public class UserServiceImplTest {
 
         // Assert - with rule
 
-    }
+    }*/
 }
