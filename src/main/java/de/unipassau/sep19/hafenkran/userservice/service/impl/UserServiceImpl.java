@@ -102,12 +102,15 @@ public class UserServiceImpl implements UserService {
             // Only delete the account if it isn't the account from the current user
             if (currentUser.getId() != id) {
                 UserDTO deletedUserDTO = UserDTO.fromUser(deletedUser);
+                deletedUser.setStatus(User.Status.DELETED);
+                userRepository.save(deletedUser);
+
                 userRepository.deleteById(id);
 
                 // Deletes everything from the chosen user, if there aren't any shared experiments, and, if there are, denies the access
                 clusterServiceClient.pushesDeletedOwnerIdAndTheChosenDeletionToClusterService(id, deleteEverything);
 
-                return deletedUserDTO;
+                return UserDTO.fromUser(deletedUser);
             } else {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "You are not allowed to delete your own account. Please contact another admin to do so.");

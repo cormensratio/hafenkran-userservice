@@ -62,7 +62,7 @@ public class User {
      * {@code INACTIVE} means that the user account is currently unavailable cause the admin didn't approve it.
      */
     public enum Status {
-        ACTIVE, INACTIVE
+        ACTIVE, INACTIVE, DELETED
     }
 
 }
