@@ -10,7 +10,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(basePackages = {
         "de.unipassau.sep19.hafenkran.userservice.controller",
         "de.unipassau.sep19.hafenkran.userservice.util",
-        "de.unipassau.sep19.hafenkran.userservice.service.impl"
+        "de.unipassau.sep19.hafenkran.userservice.service.impl",
+        "de.unipassau.sep19.hafenkran.userservice.serviceclient.impl"
 })
 @EntityScan(basePackages = {
         "de.unipassau.sep19.hafenkran.userservice.model"
