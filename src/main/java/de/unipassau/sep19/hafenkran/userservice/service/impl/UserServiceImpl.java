@@ -183,35 +183,21 @@ public class UserServiceImpl implements UserService {
                 () -> new ResourceNotFoundException(User.class, "id",
                         currentUserId.toString()));
 
-        // Throw exception if the user tries to change the settings without
-        // providing the old password.
-        if (!currentUserIsAdmin && !updateUserDTO.getPassword().isPresent()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "You have to provide your password in order to " +
-                            "modify your user settings!");
-        }
 
-        // Throw exception if the given user password is incorrect
-        if (!currentUserIsAdmin && !isPasswordMatching(currentUser.getPassword(), updateUserDTO.getPassword().get())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "The given password is not correct!");
-        }
+        if (!currentUserIsAdmin) {
+            // Throw exception if the user tries to change the settings without
+            // providing the old password.
+            if(!updateUserDTO.getPassword().isPresent()){
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "You have to provide your password in order to " +
+                                "modify your user settings!");
+            }
 
-        // Throw exception if the user is an admin and does not provide a
-        // password to modify another admin
-        if (currentUserIsAdmin && targetUser.isAdmin()
-                && !updateUserDTO.getPassword().isPresent()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "You have to provide your password in order to " +
-                            "modify your user settings!");
-        }
-
-        // Throw exception if the user is an admin and provides a wrong
-        // password to modify another admin
-        if (currentUserIsAdmin && targetUser.isAdmin()
-                && !isPasswordMatching(currentUser.getPassword(), updateUserDTO.getPassword().get())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "The given password is not correct!");
+            // Throw exception if the given user password is incorrect
+            if (!isPasswordMatching(currentUser.getPassword(), updateUserDTO.getPassword().get())) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "The given password is not correct!");
+            }
         }
 
         // Change status if the currentUser is an admin and to change the status was selected
@@ -238,12 +224,6 @@ public class UserServiceImpl implements UserService {
             if (currentUserIsAdmin) {
                 targetUser.setPassword(passwordEncoder.encode(updateUserDTO.getNewPassword().get()));
             } else if (updateUserDTO.getPassword().isPresent()) {
-                if (!isPasswordMatching(targetUser.getPassword(),
-                        updateUserDTO.getPassword().get())) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                            "The given password is not correct!");
-                }
-
                 hasCorrectPasswordLength(updateUserDTO.getNewPassword().get());
                 targetUser.setPassword(passwordEncoder.encode(updateUserDTO.getNewPassword().get()));
             }
