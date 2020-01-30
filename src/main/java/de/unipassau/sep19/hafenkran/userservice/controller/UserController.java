@@ -92,8 +92,8 @@ public class UserController {
     }
 
     /**
-     * POST-Endpoint to delete one user. This endpoint is only available for admins.
-     * If {@code deleteEverything} is set true, everything from the user will be deleted, also if it is shared.
+     * POST-Endpoint for deleting one user. This endpoint is only available for admins.
+     * All of his executions and experiments will be deleted.
      *
      * @param id The id of the user to be deleted.
      * @return A {@link UserDTO} of the user that was deleted.

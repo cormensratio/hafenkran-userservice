@@ -22,11 +22,15 @@ public class ClusterServiceClientImpl implements ClusterServiceClient {
     @Value("${cluster-service-uri}")
     private String basePath;
 
+    @Value("${service-user.secret}")
+    private String serviceSecret;
+
     /**
      * {@inheritDoc}
      */
     public void deleteExperimentsAndExecutionsFromUser(@NonNull UUID ownerId) {
-        serviceClient.post(basePath + "/experiments/deleteExperiments?ownerId=" + ownerId, "", String.class, null);
+        serviceClient.post(basePath + "/experiments/delete?ownerId=" + ownerId +
+                "&secret=" + serviceSecret, "", String.class, null);
     }
 
 }
