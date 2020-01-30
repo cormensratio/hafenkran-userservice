@@ -22,7 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class ServiceClientImpl implements ServiceClient {
 
-    @Value("${cluster-service-uri}")
+    @Value("${user-service-uri}")
     private String usPath;
 
     @Value("${service-user.name}")
