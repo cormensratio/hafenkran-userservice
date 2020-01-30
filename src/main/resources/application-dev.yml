@@ -25,3 +25,5 @@ service-user:
   name: service
   password: test
   secret: secretToken
+
+password-length-min: 8
