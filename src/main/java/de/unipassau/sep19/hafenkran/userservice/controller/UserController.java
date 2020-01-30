@@ -83,7 +83,7 @@ public class UserController {
      * @param newUserInfo the DTO that holds the new user information.
      * @return A {@link UserDTO} containing the details of the updated user.
      */
-    @PostMapping("/update/{userId}")
+    @PostMapping("/{userId}/update")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public UserDTO updateUser(@NonNull @PathVariable UUID userId,
@@ -97,7 +97,7 @@ public class UserController {
      * @param id The id of the user to be deleted.
      * @return A {@link UserDTO} of the user that was deleted.
      */
-    @PostMapping("/delete/{id}")
+    @PostMapping("/{id}/delete")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public UserDTO deleteUser(@PathVariable UUID id) {
