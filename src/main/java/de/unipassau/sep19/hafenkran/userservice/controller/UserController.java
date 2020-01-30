@@ -83,7 +83,7 @@ public class UserController {
      * @param newUserInfo the DTO that holds the new user information.
      * @return A {@link UserDTO} containing the details of the updated user.
      */
-    @PatchMapping("/{userId}")
+    @PostMapping("/{userId}")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public UserDTO updateUser(@NonNull @PathVariable UUID userId,
