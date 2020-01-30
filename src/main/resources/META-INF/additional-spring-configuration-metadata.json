@@ -44,6 +44,11 @@
       "name": "cluster-service-uri",
       "type": "java.lang.String",
       "description": "URI for the ClusterService."
+    },
+    {
+      "name": "password-length-min",
+      "type": "java.lang.Integer",
+      "description": "The minimum length of a password."
     }
   ]
 }

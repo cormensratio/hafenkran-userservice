@@ -89,6 +89,7 @@ public interface UserService extends UserDetailsService {
      * @param updateUserDTO The DTO that contains the new user information.
      * @return The {@link UserDTO} of the updated user.
      */
-    UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO);
+    UserDTO updateUser(@NonNull UUID userId,
+                       @NonNull UserUpdateDTO updateUserDTO);
 
 }

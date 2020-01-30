@@ -7,6 +7,7 @@ import de.unipassau.sep19.hafenkran.userservice.dto.UserDTOMinimal;
 import de.unipassau.sep19.hafenkran.userservice.dto.UserUpdateDTO;
 import de.unipassau.sep19.hafenkran.userservice.exception.ResourceNotFoundException;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
+import de.unipassau.sep19.hafenkran.userservice.model.User.Status;
 import de.unipassau.sep19.hafenkran.userservice.repository.UserRepository;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import de.unipassau.sep19.hafenkran.userservice.serviceclient.ClusterServiceClient;
@@ -14,6 +15,7 @@ import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -26,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -37,9 +40,10 @@ public class UserServiceImpl implements UserService {
 
     @NonNull
     private final UserRepository userRepository;
-
     @NonNull
     private final PasswordEncoder passwordEncoder;
+    @Value("${password-length-min}")
+    private int MIN_PASSWORD_LENGTH;
 
     @NonNull
     private final ClusterServiceClient clusterServiceClient;
@@ -69,14 +73,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTOMinimal> retrieveUserInformation(List<UUID> ids) {
         return UserDTOMinimal.convertMinimalUserListToDTOList(findUserList(ids));
-    }
-
-    private List<User> findUserList(List<UUID> ids) {
-        if (ids.isEmpty()) {
-            return (List<User>) userRepository.findAll();
-        } else {
-            return userRepository.findByIdIn(ids);
-        }
     }
 
     /**
@@ -167,57 +163,112 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO) {
-        UUID id = updateUserDTO.getId();
-        User.Status status = updateUserDTO.getStatus();
-        User targetUser = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(User.class, "id", id.toString()));
+    public UserDTO updateUser(@NonNull UUID userId,
+                              @NonNull UserUpdateDTO updateUserDTO) {
+        final UserDTO currentUserDTO = SecurityContextUtil.getCurrentUserDTO();
+        final boolean currentUserIsAdmin = currentUserDTO.isAdmin();
+        final UUID targetUserId = userId;
+        final UUID currentUserId = currentUserDTO.getId();
+        final Optional<Status> status = updateUserDTO.getStatus();
 
-        UserDTO currentUserDTO = SecurityContextUtil.getCurrentUserDTO();
-        boolean currentUserIsAdmin = currentUserDTO.isAdmin();
-
-        if (!id.equals(currentUserDTO.getId()) && !currentUserIsAdmin) {
+        if (!currentUserIsAdmin && !targetUserId.equals(currentUserDTO.getId())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "Only admins are allowed to update other users!");
+                    "You are not allowed to update users!");
         }
 
-        if (!currentUserIsAdmin) {
-            if (!isPasswordMatching(targetUser.getPassword(), updateUserDTO.getPassword())) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                        "The given user password is not correct!");
-            }
+        User targetUser = userRepository.findById(targetUserId).orElseThrow(
+                () -> new ResourceNotFoundException(User.class, "id", targetUserId.toString()));
+
+        User currentUser = userRepository.findById(currentUserId).orElseThrow(
+                () -> new ResourceNotFoundException(User.class, "id",
+                        currentUserId.toString()));
+
+        // Throw exception if the user tries to change the settings without
+        // providing the old password.
+        if (!currentUserIsAdmin && !updateUserDTO.getPassword().isPresent()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You have to provide your password in order to " +
+                            "modify your user settings!");
+        }
+
+        // Throw exception if the given user password is incorrect
+        if (!currentUserIsAdmin && !isPasswordMatching(currentUser.getPassword(), updateUserDTO.getPassword().get())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "The given password is not correct!");
+        }
+
+        // Throw exception if the user is an admin and does not provide a
+        // password to modify another admin
+        if (currentUserIsAdmin && targetUser.isAdmin()
+                && !updateUserDTO.getPassword().isPresent()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You have to provide your password in order to " +
+                            "modify your user settings!");
+        }
+
+        // Throw exception if the user is an admin and provides a wrong
+        // password to modify another admin
+        if (currentUserIsAdmin && targetUser.isAdmin()
+                && !isPasswordMatching(currentUser.getPassword(), updateUserDTO.getPassword().get())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "The given password is not correct!");
         }
 
         // Change status if the currentUser is an admin and to change the status was selected
-        if (status != targetUser.getStatus() && currentUserIsAdmin) {
+        if (currentUserIsAdmin
+                && status.isPresent()) {
             if (targetUser.getId() == currentUserDTO.getId()) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "You aren't allowed to change your own status.");
             } else {
-                targetUser.setStatus(status);
+                targetUser.setStatus(status.get());
             }
         }
 
-        // set admin flag of updated user only if the user that updates it is an admin
-        boolean isAdmin = targetUser.isAdmin();
-        if (currentUserIsAdmin) {
-            isAdmin = updateUserDTO.isAdmin();
+        // Set admin flag of updated user only if the user that updates it is
+        // an admin
+        if (!currentUserIsAdmin && updateUserDTO.getIsAdmin().isPresent()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You are no admin and not allowed to change the admin status!");
+        } else if (currentUserIsAdmin && updateUserDTO.getIsAdmin().isPresent()) {
+            targetUser.setAdmin(updateUserDTO.getIsAdmin().get());
+
         }
 
-        String password = targetUser.getPassword();
-        if (!updateUserDTO.getNewPassword().equals("")) {
-            password = passwordEncoder.encode(updateUserDTO.getNewPassword());
+        if (updateUserDTO.getNewPassword().isPresent() && !updateUserDTO.getNewPassword().get().isEmpty()) {
+            if (currentUserIsAdmin) {
+                targetUser.setPassword(passwordEncoder.encode(updateUserDTO.getNewPassword().get()));
+            } else if (updateUserDTO.getPassword().isPresent()) {
+                if (!isPasswordMatching(targetUser.getPassword(),
+                        updateUserDTO.getPassword().get())) {
+                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                            "The given password is not correct!");
+                }
+
+                hasCorrectPasswordLength(updateUserDTO.getNewPassword().get());
+                targetUser.setPassword(passwordEncoder.encode(updateUserDTO.getNewPassword().get()));
+            }
         }
 
-        targetUser.setPassword(password);
-        targetUser.setEmail(updateUserDTO.getEmail());
-        targetUser.setAdmin(isAdmin);
+        if (updateUserDTO.getEmail().isPresent()
+                && !updateUserDTO.getEmail().get().isEmpty()) {
+            targetUser.setEmail(updateUserDTO.getEmail().get());
+        }
 
         userRepository.save(targetUser);
         return UserDTO.fromUser(targetUser);
     }
 
+    private List<User> findUserList(List<UUID> ids) {
+        if (ids.isEmpty()) {
+            return (List<User>) userRepository.findAll();
+        } else {
+            return userRepository.findByIdIn(ids);
+        }
+    }
+
     /**
-     * Checks if two passwords, one encoded, the other in plain text are matching
+     * Checks if two passwords, one encoded, the other in plain text are
+     * matching
      *
      * @param encodedPassword   the encoded password
      * @param plaintextPassword the plain text password
@@ -225,5 +276,13 @@ public class UserServiceImpl implements UserService {
      */
     private boolean isPasswordMatching(@NonNull String encodedPassword, @NonNull String plaintextPassword) {
         return passwordEncoder.matches(plaintextPassword, encodedPassword);
+    }
+
+    private void hasCorrectPasswordLength(@NonNull String password) {
+        if (password.length() < MIN_PASSWORD_LENGTH) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "The given password was not long enough! Expected " +
+                            "minimum length of: " + MIN_PASSWORD_LENGTH);
+        }
     }
 }
