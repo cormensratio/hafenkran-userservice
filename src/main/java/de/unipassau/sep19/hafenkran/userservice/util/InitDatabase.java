@@ -1,6 +1,5 @@
 package de.unipassau.sep19.hafenkran.userservice.util;
 
-import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import lombok.NonNull;

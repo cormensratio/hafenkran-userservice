@@ -1,6 +1,6 @@
 package de.unipassau.sep19.hafenkran.userservice.service.impl;
 
-import org.junit.runner.RunWith;
+/*import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;

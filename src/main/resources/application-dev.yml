@@ -18,8 +18,12 @@ jwt:
 
 mockdata: true
 
+user-service-uri: http://localhost:8081
+cluster-service-uri: http://localhost:8082
+
 service-user:
   name: service
   password: test
+  secret: secretToken
 
 password-length-min: 8

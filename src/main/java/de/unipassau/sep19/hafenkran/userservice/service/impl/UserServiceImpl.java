@@ -10,6 +10,7 @@ import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.model.User.Status;
 import de.unipassau.sep19.hafenkran.userservice.repository.UserRepository;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
+import de.unipassau.sep19.hafenkran.userservice.serviceclient.ClusterServiceClient;
 import de.unipassau.sep19.hafenkran.userservice.util.SecurityContextUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,9 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     @Value("${password-length-min}")
     private int MIN_PASSWORD_LENGTH;
+
+    @NonNull
+    private final ClusterServiceClient clusterServiceClient;
 
     /**
      * {@inheritDoc}
@@ -93,8 +97,12 @@ public class UserServiceImpl implements UserService {
 
             // Only delete the account if it isn't the account from the current user
             if (currentUser.getId() != id) {
+
                 deletedUser.setStatus(User.Status.DELETED);
                 userRepository.save(deletedUser);
+
+                clusterServiceClient.deleteExperimentsAndExecutionsFromUser(id);
+
                 return UserDTO.fromUser(deletedUser);
             } else {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
