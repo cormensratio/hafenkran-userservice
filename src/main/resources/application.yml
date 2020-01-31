@@ -18,7 +18,8 @@ spring:
             non_contextual_creation: true
 
 jwt:
-  validity: {5 * 60 * 60}
+  auth-validity: 172800
+  refresh-validity: 300
   secret:
 
 mockdata: false
@@ -26,5 +27,6 @@ mockdata: false
 service-user:
   name: service
   password: test
+  secret: secreetToken
 
 password-length-min: 8
