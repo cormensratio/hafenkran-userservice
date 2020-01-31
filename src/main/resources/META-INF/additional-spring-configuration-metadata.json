@@ -34,6 +34,21 @@
       "name": "service-user.password",
       "type": "java.lang.String",
       "description": "The password of the user used for internal communication between the microservices."
+    },
+    {
+      "name": "user-service-uri",
+      "type": "java.lang.String",
+      "description": "URI for the UserService."
+    },
+    {
+      "name": "cluster-service-uri",
+      "type": "java.lang.String",
+      "description": "URI for the ClusterService."
+    },
+    {
+      "name": "password-length-min",
+      "type": "java.lang.Integer",
+      "description": "The minimum length of a password."
     }
   ]
 }

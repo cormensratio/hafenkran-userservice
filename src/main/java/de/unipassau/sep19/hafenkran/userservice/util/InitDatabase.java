@@ -1,6 +1,5 @@
 package de.unipassau.sep19.hafenkran.userservice.util;
 
-import de.unipassau.sep19.hafenkran.userservice.dto.UserCreateDTO;
 import de.unipassau.sep19.hafenkran.userservice.model.User;
 import de.unipassau.sep19.hafenkran.userservice.service.UserService;
 import lombok.NonNull;
@@ -45,7 +44,7 @@ public class InitDatabase implements CommandLineRunner {
             userService.registerNewUser(admin);
             User user = new User("Rick", passwordEncoder.encode("test"), "", false);
             user.setId(UUID.fromString("00000000-0000-0000-0000-000000000002"));
-            admin.setStatus(User.Status.ACTIVE);
+            user.setStatus(User.Status.ACTIVE);
             userService.registerNewUser(user);
         }
     }

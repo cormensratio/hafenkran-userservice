@@ -43,7 +43,8 @@ public interface UserService extends UserDetailsService {
     UserDTO getUserDTOFromUserId(@NonNull UUID userId);
 
     /**
-     * Deletes the user with the {@code id}.
+     * Deletes the user with the {@code id} and all his executions and 
+     * all of the experiments as well.
      *
      * @param id The id of the user to be deleted.
      * @return A {@link UserDTO} of the deleted user.
@@ -87,6 +88,7 @@ public interface UserService extends UserDetailsService {
      * @param updateUserDTO The DTO that contains the new user information.
      * @return The {@link UserDTO} of the updated user.
      */
-    UserDTO updateUser(@NonNull UserUpdateDTO updateUserDTO);
+    UserDTO updateUser(@NonNull UUID userId,
+                       @NonNull UserUpdateDTO updateUserDTO);
 
 }

@@ -9,7 +9,8 @@ spring:
     initialization-mode: always
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
+    show-sql: false
 
 jwt:
   auth-validity: 172800
@@ -18,6 +19,12 @@ jwt:
 
 mockdata: true
 
+user-service-uri: http://localhost:8081
+cluster-service-uri: http://localhost:8082
+
 service-user:
   name: service
   password: test
+  secret: secretToken
+
+password-length-min: 8

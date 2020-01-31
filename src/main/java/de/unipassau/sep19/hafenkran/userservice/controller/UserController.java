@@ -80,23 +80,25 @@ public class UserController {
      * Updates the given user.
      * The params, that can be updated, are the password, the email, the status and the adminFlag.
      *
-     * @param newUserInfo the DTO that holds the new user informations.
+     * @param newUserInfo the DTO that holds the new user information.
      * @return A {@link UserDTO} containing the details of the updated user.
      */
-    @PostMapping("/update")
+    @PostMapping("/{userId}/update")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO updateUser(@Valid @RequestBody UserUpdateDTO newUserInfo) {
-        return userService.updateUser(newUserInfo);
+    public UserDTO updateUser(@NonNull @PathVariable UUID userId,
+                              @Valid @RequestBody UserUpdateDTO newUserInfo) {
+        return userService.updateUser(userId, newUserInfo);
     }
 
     /**
-     * POST-Endpoint to delete one user. This endpoint is only available for admins.
+     * POST-Endpoint for deleting one user. This endpoint is only available for admins.
+     * All of his executions and experiments will be deleted.
      *
      * @param id The id of the user to be deleted.
      * @return A {@link UserDTO} of the user that was deleted.
      */
-    @PostMapping("/delete/{id}")
+    @PostMapping("/{id}/delete")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public UserDTO deleteUser(@PathVariable UUID id) {
